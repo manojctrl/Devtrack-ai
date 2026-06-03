@@ -1,3 +1,4 @@
+import HowItWorks from "../../components/HowItWorks/HowItWorks";
 import Navbar from "../../components/Navbar/Navbar";
 
 const Landing = () => {
@@ -165,6 +166,8 @@ const Landing = () => {
 
         </div>
       </section>
+      {/* How It Works Section suru vayo haita  */}
+      <HowItWorks/>
     </div>
   );
 };
