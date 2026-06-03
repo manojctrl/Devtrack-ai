@@ -1,10 +1,11 @@
 import CTA from "../../components/CTA/CTA";
+import Footer from "../../components/Footer/Footer";
 import HowItWorks from "../../components/HowItWorks/HowItWorks";
 import Navbar from "../../components/Navbar/Navbar";
 
 const Landing = () => {
   return (
-    <div>
+    <>
       <Navbar />
 
       {/* Hero Section */}
@@ -57,7 +58,7 @@ const Landing = () => {
       </section>
 
       {/* Features Section */}
-      <section className="px-4 md:px-16 py-20 bg-white">
+      <section className=" bg-gray-50 px-4 md:px-16 py-20 bg-white">
         <div className="mb-[72px] text-center">
           <div className="flex justify-center text-sm font-medium tracking-wider uppercase text-indigo-500">
             Core Features
@@ -170,7 +171,9 @@ const Landing = () => {
       {/* How It Works Section suru vayo haita  */}
       <HowItWorks/>
       <CTA/>
-    </div>
+      <Footer/>
+    
+    </>
   );
 };
 

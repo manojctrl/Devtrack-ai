@@ -1,7 +1,7 @@
 
 const CTA = () => {
   return (
-    <section className="py-24 lg:py-32 px-6 md:px-16 text-center bg-white">
+    <section className=" bg-gray-50 py-24 lg:py-32 px-6 md:px-16 text-center bg-white">
       <div className="group relative max-w-2xl mx-auto rounded-3xl border border-indigo-500/20 bg-gray-50/50 p-10 md:p-16 overflow-hidden reveal">
         
         {/* Content */}

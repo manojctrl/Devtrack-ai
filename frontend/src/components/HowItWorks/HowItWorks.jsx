@@ -1,8 +1,7 @@
-import React from 'react';
 
 const HowItWorks = () => {
   return (
-    <section className="py-20 md:py-28 px-6 md:px-16 bg-white border-t border-b border-gray-100" id="how">
+    <section className="bg-gray-50  py-20 md:py-28 px-6 md:px-16 bg-white border-t border-b border-gray-100" id="how">
       <div className="max-w-[1100px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
         
         {/* Left Content (Steps) */}
