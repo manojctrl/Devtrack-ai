@@ -1,0 +1,168 @@
+# 🚀 DevTrack AI
+
+DevTrack AI is a full-stack developer analytics platform that helps developers showcase their coding journey through GitHub insights, skill analytics, resume generation, and AI-powered career recommendations.
+
+The platform provides a centralized dashboard where developers can monitor their GitHub activity, track technical growth, generate professional resumes, and share a public profile with recruiters.
+
+---
+
+## 🌟 Features
+
+### 🔐 Authentication
+
+* User Registration & Login
+* Secure JWT Authentication
+* Protected Routes
+
+### 🐙 GitHub Integration
+
+* Connect GitHub Account
+* Fetch User Profile
+* Repository Analytics
+* Contribution Tracking
+* Language Statistics
+
+### 📊 Analytics Dashboard
+
+* Total Repositories
+* Total Commits
+* Stars & Followers
+* Coding Activity Overview
+* Contribution Heatmap
+
+### 🧠 Skill Analytics
+
+* Automatic Skill Detection
+* Technology Usage Analysis
+* Skill Strength Visualization
+* Learning Gap Identification
+
+### 🤖 AI Career Coach
+
+* Career Recommendations
+* Role Suggestions
+* Learning Roadmaps
+* Skill Improvement Guidance
+
+### 📄 Resume Generator
+
+* Auto-generated Resume
+* Downloadable PDF
+* Project Showcase
+* Skill Summary
+
+### 🌐 Public Developer Profile
+
+* Shareable Portfolio Link
+* Recruiter-Friendly View
+* GitHub Statistics
+* Skills & Projects Showcase
+
+---
+
+## 🏗️ Tech Stack
+
+### Frontend
+
+* React.js
+* Tailwind CSS
+* React Router
+* Axios
+* Recharts
+
+### Backend
+
+* Node.js
+* Express.js
+* JWT Authentication
+* Bcrypt.js
+
+### Database
+
+* MySQL
+
+### APIs
+
+* GitHub REST API
+* Gemini AI API
+
+### Deployment
+
+* Frontend: Vercel
+* Backend: Render
+* Database: MySQL
+
+---
+
+## 📂 Project Structure
+
+```bash
+DevTrack-AI
+│
+├── frontend
+│   ├── src
+│   │   ├── pages
+│   │   ├── components
+│   │   ├── layouts
+│   │   ├── services
+│   │   └── routes
+│   └── public
+│
+├── backend
+│   ├── controllers
+│   ├── routes
+│   ├── middleware
+│   ├── models
+│   ├── config
+│   └── server.js
+│
+└── README.md
+```
+
+---
+
+## 🔄 Workflow
+
+1. User creates an account.
+2. User connects GitHub profile.
+3. System fetches GitHub repositories and statistics.
+4. Analytics dashboard displays coding activity.
+5. Skills are automatically analyzed.
+6. AI generates career recommendations.
+7. Resume can be generated and downloaded.
+8. Public profile can be shared with recruiters.
+
+---
+
+## 🎯 Problem Statement
+
+Developers often struggle to showcase their technical growth and GitHub activity in a professional way. Recruiters need to visit multiple platforms to evaluate a candidate's skills and experience.
+
+DevTrack AI solves this problem by combining GitHub analytics, skill tracking, AI recommendations, and resume generation into a single platform.
+
+---
+
+## 🚀 Future Enhancements
+
+* GitHub OAuth Authentication
+* LinkedIn Integration
+* Docker Support
+* AWS Deployment
+* Real-Time Analytics
+* Team Collaboration Features
+* Coding Challenge Tracker
+* Interview Preparation Module
+
+---
+
+## 👨‍💻 Author
+
+Manoj Katwal
+
+Aspiring Full-Stack Developer passionate about building modern web applications, solving real-world problems, and continuously learning new technologies.
+
+---
+
+## 📜 License
+
+This project is licensed under the MIT License.
