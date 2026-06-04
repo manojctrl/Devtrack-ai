@@ -1,8 +1,8 @@
 import { Link } from "react-router-dom";
-import { Mail, Lock, EyeOff, Eye, ArrowLeft } from "lucide-react"; // ArrowLeft थपिएको छ
+import { Mail, Lock, EyeOff, Eye, ArrowLeft } from "lucide-react"; 
 import { useState } from "react";
 import { FaGithub } from "react-icons/fa";
-
+import { GitBranch, CheckCircle2 } from "lucide-react";
 
 export const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -71,7 +71,9 @@ export const Login = () => {
                   type="email"
                   placeholder="Enter your email"
                   className="w-full bg-[#171e30] border border-slate-700/40 rounded-xl py-3 pl-11 pr-4 text-white text-sm outline-none transition-all duration-200 placeholder-[#52525b] focus:border-[#a855f7] focus:ring-1 focus:ring-[#a855f7]"
-                  onChange={(e)=>setFormData({...formData, email: e.target.value})}
+                  onChange={(e) =>
+                    setFormData({ ...formData, email: e.target.value })
+                  }
                 />
               </div>
             </div>
@@ -89,7 +91,9 @@ export const Login = () => {
                   type={showPassword ? "text" : "password"}
                   placeholder="Enter your password"
                   className="w-full bg-[#171e30] border border-slate-700/40 rounded-xl py-3 pl-11 pr-11 text-white text-sm outline-none transition-all duration-200 placeholder-[#52525b] focus:border-[#a855f7] focus:ring-1 focus:ring-[#a855f7]"
-                  onChange={(e)=>setFormData({...formData, password: e.target.value})}
+                  onChange={(e) =>
+                    setFormData({ ...formData, password: e.target.value })
+                  }
                 />
                 <button
                   type="button"
@@ -108,22 +112,45 @@ export const Login = () => {
               Sign in to your account
             </button>
           </form>
-         <div className="relative flex items-center justify-center my-6">
+          <div className="relative flex items-center justify-center my-6">
             <div className="border-t border-[#1e293b] w-full"></div>
-            <span className="absolute bg-[#111625] px-3 text-xs text-[#64748b] uppercase tracking-wider">or continue with</span>
+            <span className="absolute bg-[#111625] px-3 text-xs text-[#64748b] uppercase tracking-wider">
+              or continue with
+            </span>
           </div>
           <button className="w-full bg-[#171e30] border border-slate-700/40 text-white py-3 px-4 rounded-xl flex items-center justify-center gap-2.5 text-sm font-medium transition-colors duration-200 hover:bg-[#1e263d]">
             <FaGithub className="w-5 h-5 text-white fill-current" />
             Sign in with GitHub
           </button>
-          
         </div>
 
         {/* Right Side */}
-        <div className="w-full md:w-[48%] p-8 md:p-12 flex flex-col justify-center bg-[#141b2d] border-t md:border-t-0 md:border-l border-slate-700/50">
-          RIGHT
+        <div className="w-full md:w-[48%] bg-[#141b2d] border-t md:border-t-0 md:border-l border-slate-700/50 p-8 md:p-12 flex flex-col justify-center gap-10">
+          <div className="max-w-[340px]">
+            <h2 className="text-2xl font-bold text-white leading-snug mb-3">Engineered for modern developers.</h2>
+            <p className="text-sm text-[#94a3b8] leading-relaxed">Track your daily impact, automate your portfolio, and supercharge your technical career.</p>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            {/* Box 1 */}
+            <div className="bg-[#0b0f19] border border-slate-700/30 rounded-[14px] p-5 transition-colors duration-200 hover:border-purple-500/40">
+              <span className="text-[#a855f7] mb-3 block">
+                <GitBranch className="w-5 h-5" />
+              </span>
+              <h3 className="text-sm font-semibold text-white mb-1.5">1-Click Sync</h3>
+              <p className="text-xs text-[#64748b] leading-normal">Connect your GitHub and let us handle the rest.</p>
+            </div>
+
+            {/* Box 2 */}
+            <div className="bg-[#0b0f19] border border-slate-700/30 rounded-[14px] p-5 transition-colors duration-200 hover:border-purple-500/40">
+              <span className="text-[#34d399] mb-3 block">
+                <CheckCircle2 className="w-5 h-5" />
+              </span>
+              <h3 className="text-sm font-semibold text-white mb-1.5">Verified Proof</h3>
+              <p className="text-xs text-[#64748b] leading-normal">Showcase real code metrics to employers.</p>
+            </div>
+          </div>
+        </div>
         </div>
       </div>
-    </div>
   );
 };
