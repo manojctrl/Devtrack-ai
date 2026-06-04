@@ -9,7 +9,7 @@ const Landing = () => {
       <Navbar />
 
       {/* Hero Section */}
-      <section className="bg-gray-50 text-gray-900 min-h-screen flex flex-col items-center justify-center pt-20">
+      <section className="bg-gray-50 text-gray-900 min-h-screen flex flex-col items-center justify-center pt-20" id='blog'>
         <div className="mb-4 text-sm text-indigo-600 font-semibold">
           Now in public beta — 2,400+ developers
         </div>
@@ -58,7 +58,7 @@ const Landing = () => {
       </section>
 
       {/* Features Section */}
-      <section className=" bg-gray-50 px-4 md:px-16 py-20 bg-white">
+      <section className=" bg-gray-50 px-4 md:px-16 py-20 bg-white" id='features'>
         <div className="mb-[72px] text-center">
           <div className="flex justify-center text-sm font-medium tracking-wider uppercase text-indigo-500">
             Core Features
