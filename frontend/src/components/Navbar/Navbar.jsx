@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import myLogo from "../../assets/logo.png";
 
 const Navbar = () => {
@@ -56,11 +57,12 @@ const Navbar = () => {
           </a>
         </li>
       </ul>
-
-      <button className="relative px-6 py-2.5 text-white font-semibold rounded-full overflow-hidden group bg-gradient-to-r from-indigo-600 to-purple-600 hover:shadow-lg hover:shadow-indigo-500/50 transition-all duration-300 hover:scale-105">
-        <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-        <span className="relative">Get Started Free</span>
-      </button>
+      <Link to="/auth">
+        <button className="relative px-6 py-2.5 text-white font-semibold rounded-full overflow-hidden group bg-gradient-to-r from-indigo-600 to-purple-600 hover:shadow-lg hover:shadow-indigo-500/50 transition-all duration-300 hover:scale-105">
+          <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+          <span className="relative">Get Started Free</span>
+        </button>
+      </Link>
     </nav>
   );
 };

@@ -6,7 +6,7 @@ const AppRouter = () => {
   return (
     <Routes>
         <Route path="/" element={<Landing />} />
-        <Route path="/login" element={<Login />}/>
+        <Route path="/auth" element={<Login />}/>
         
     </Routes>
   )

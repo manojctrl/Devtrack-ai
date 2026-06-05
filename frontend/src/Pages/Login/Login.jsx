@@ -2,7 +2,17 @@ import { Link } from "react-router-dom";
 import { Mail, Lock, EyeOff, Eye, ArrowLeft } from "lucide-react";
 import { useState } from "react";
 import { FaGithub } from "react-icons/fa";
-import { GitBranch, CheckCircle2 } from "lucide-react";
+
+
+
+import {
+  BarChart3,
+  FileText,
+  TrendingUp,
+  BrainCircuit,
+  Link2,
+  Users,
+} from "lucide-react";
 
 export const Login = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -11,6 +21,7 @@ export const Login = () => {
     email: "",
     password: "",
   });
+
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log("Form Data:", loginData);
@@ -211,59 +222,134 @@ export const Login = () => {
               type="submit"
               className="w-full bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-semibold py-3 px-4 rounded-xl text-sm mt-2 transition-opacity duration-200 hover:opacity-95 shadow-[0_10px_15px_-3px_rgba(147,51,234,0.25)]"
             >
-              {isLogin ? "Sign in to your account" : "Create your DevTrack profile"}
+              {isLogin
+                ? "Sign in to your account"
+                : "Create your DevTrack profile"}
             </button>
           </form>
           <div className="relative flex items-center justify-center my-6">
             <div className="border-t border-[#1e293b] w-full"></div>
             <span className="absolute bg-[#111625] px-3 text-xs text-[#64748b] uppercase tracking-wider">
-              or continue with
+              {isLogin ? "or continue with" : "or sign up with"}
             </span>
           </div>
           <button className="w-full bg-[#171e30] border border-slate-700/40 text-white py-3 px-4 rounded-xl flex items-center justify-center gap-2.5 text-sm font-medium transition-colors duration-200 hover:bg-[#1e263d]">
-            <FaGithub className="w-5 h-5 text-white fill-current" />
-            Sign in with GitHub
+            <span>
+              <FaGithub className="w-5 h-5 text-white fill-current" />
+            </span>
+            {isLogin ? "Sign in with GitHub" : "Sign up with GitHub"}
           </button>
         </div>
 
         {/* Right Side */}
         <div className="w-full md:w-[48%] bg-[#141b2d] border-t md:border-t-0 md:border-l border-slate-700/50 p-8 md:p-12 flex flex-col justify-center gap-10">
-          <div className="max-w-[340px]">
-            <h2 className="text-2xl font-bold text-white leading-snug mb-3">
-              Engineered for modern developers.
-            </h2>
-            <p className="text-sm text-[#94a3b8] leading-relaxed">
-              Track your daily impact, automate your portfolio, and supercharge
-              your technical career.
-            </p>
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            {/* Box 1 */}
-            <div className="bg-[#0b0f19] border border-slate-700/30 rounded-[14px] p-5 transition-colors duration-200 hover:border-purple-500/40">
-              <span className="text-[#a855f7] mb-3 block">
-                <GitBranch className="w-5 h-5" />
-              </span>
-              <h3 className="text-sm font-semibold text-white mb-1.5">
-                1-Click Sync
-              </h3>
-              <p className="text-xs text-[#64748b] leading-normal">
-                Connect your GitHub and let us handle the rest.
-              </p>
-            </div>
+          <div>
+            <span className="text-[11px] font-bold text-slate-500 uppercase tracking-widest block mb-6">
+              {isLogin ? "DevTrack Features" : "What you get"}
+            </span>
 
-            {/* Box 2 */}
-            <div className="bg-[#0b0f19] border border-slate-700/30 rounded-[14px] p-5 transition-colors duration-200 hover:border-purple-500/40">
-              <span className="text-[#34d399] mb-3 block">
-                <CheckCircle2 className="w-5 h-5" />
-              </span>
-              <h3 className="text-sm font-semibold text-white mb-1.5">
-                Verified Proof
-              </h3>
-              <p className="text-xs text-[#64748b] leading-normal">
-                Showcase real code metrics to employers.
-              </p>
+            <div className="space-y-6">
+              {/* Feature 1 */}
+              <div className="flex gap-4">
+                <div className="w-10 h-10 rounded-xl bg-[#1d263b] flex items-center justify-center text-slate-400 shrink-0">
+                  <BarChart3 className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-white text-sm">
+                    {isLogin ? "GitHub synced" : "Live GitHub stats"}
+                  </h3>
+                  <p className="text-xs text-slate-400 mt-1 leading-relaxed">
+                    {isLogin
+                      ? "Auto-pulls repos, commits & contribution graph"
+                      : "Repos, commits, stars & heatmap auto-synced."}
+                  </p>
+                </div>
+              </div>
+
+              {/* Feature 2 */}
+              <div className="flex gap-4">
+                <div className="w-10 h-10 rounded-xl bg-[#1d263b] flex items-center justify-center text-emerald-400 shrink-0">
+                  {isLogin ? (
+                    <TrendingUp className="w-5 h-5" />
+                  ) : (
+                    <FileText className="w-5 h-5" />
+                  )}
+                </div>
+                <div>
+                  <h3 className="font-semibold text-white text-sm">
+                    {isLogin ? "Skill analytics" : "PDF resume generator"}
+                  </h3>
+                  <p className="text-xs text-slate-400 mt-1 leading-relaxed">
+                    {isLogin
+                      ? "Data-driven proficiency scores — no guessing."
+                      : "One click — professional resume from your data."}
+                  </p>
+                </div>
+              </div>
+
+              {/* Feature 3 */}
+              <div className="flex gap-4">
+                <div className="w-10 h-10 rounded-xl bg-[#1d263b] flex items-center justify-center text-purple-400 shrink-0">
+                  {isLogin ? (
+                    <BrainCircuit className="w-5 h-5" />
+                  ) : (
+                    <Link2 className="w-5 h-5" />
+                  )}
+                </div>
+                <div>
+                  <h3 className="font-semibold text-white text-sm">
+                    {isLogin ? "AI coach" : "Recruiter share link"}
+                  </h3>
+                  <p className="text-xs text-slate-400 mt-1 leading-relaxed">
+                    {isLogin
+                      ? "Gemini-powered career roadmap built for you."
+                      : "devtrack.io/yourname — live portfolio URL."}
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
+
+          {/* Bottom Testimonial OR Social Proof */}
+          {isLogin ? (
+            <div className="border-t border-slate-800/80 pt-6 mt-8">
+              <p className="text-xs italic text-slate-400 leading-relaxed">
+                "Got my first job offer 2 weeks after sharing my DevTrack
+                profile."
+              </p>
+              <div className="flex items-center gap-3 mt-4">
+                <div className="w-7 h-7 bg-purple-500 rounded-full flex items-center justify-center text-[10px] font-bold text-white">
+                  RK
+                </div>
+                <span className="text-xs font-medium text-slate-300">
+                  Rahul K. — Java Dev, Bangalore
+                </span>
+              </div>
+            </div>
+          ) : (
+            <div className="bg-[#171e30]/80 border border-slate-800/80 rounded-xl p-4 mt-8">
+              <div className="flex items-center gap-2 mb-2">
+                <Users className="w-4 h-4 text-purple-400" />
+                <span className="text-xs font-semibold text-white">
+                  2,400+ developers joined
+                </span>
+              </div>
+              <div className="flex -space-x-2 overflow-hidden mb-2">
+                <div className="inline-block h-6 w-6 rounded-full ring-2 ring-[#171e30] bg-purple-500 text-[9px] flex items-center justify-center font-bold text-white">
+                  MK
+                </div>
+                <div className="inline-block h-6 w-6 rounded-full ring-2 ring-[#171e30] bg-emerald-500 text-[9px] flex items-center justify-center font-bold text-white">
+                  RS
+                </div>
+                <div className="inline-block h-6 w-6 rounded-full ring-2 ring-[#171e30] bg-blue-500 text-[9px] flex items-center justify-center font-bold text-white">
+                  AP
+                </div>
+              </div>
+              <p className="text-[11px] text-slate-400">
+                4.9 / 5 from 340 reviews
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </div>
