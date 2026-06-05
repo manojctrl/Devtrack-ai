@@ -3,8 +3,6 @@ import { Mail, Lock, EyeOff, Eye, ArrowLeft } from "lucide-react";
 import { useState } from "react";
 import { FaGithub } from "react-icons/fa";
 
-
-
 import {
   BarChart3,
   FileText,
@@ -22,26 +20,28 @@ export const Login = () => {
     password: "",
   });
 
-  const [registerData, setRegisterData ] = useState({
-    firstName : "",
-    lastName:"",
-    email:"",
+  const [registerData, setRegisterData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
     gitHubUserName: "",
-    password:"",
-    confirmPassword:""
-
-  })
+    password: "",
+    confirmPassword: "",
+  });
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if(isLogin){
+    if (isLogin) {
       console.log("login Data", loginData);
       alert("Login Successfull");
-
-    }else{
-      console.log("Register Data", registerData)
-      
-
+    } else {
+      // console.log("Register Data", registerData)
+      if (registerData.password !== registerData.confirmPassword) {
+        alert("Password do not match");
+        return;
+      }
+      console.log("registerData", registerData);
+      alert("Registerd successfull");
     }
   };
   return (
@@ -122,7 +122,12 @@ export const Login = () => {
                     <input
                       type="text"
                       placeholder="Enter your first name"
-                      onChange={(e)=>setRegisterData({...registerData, firstName:e.target.value})}
+                      onChange={(e) =>
+                        setRegisterData({
+                          ...registerData,
+                          firstName: e.target.value,
+                        })
+                      }
                       value={registerData.firstName}
                       className="w-full bg-[#171e30] border border-slate-700/50 rounded-xl py-2.5 px-4 text-white placeholder-slate-500 focus:outline-none focus:border-purple-500 text-sm"
                       required
@@ -135,7 +140,12 @@ export const Login = () => {
                     <input
                       type="text"
                       placeholder="Enter your last name"
-                      onChange={(e) => setRegisterData({...registerData, lastName: e.target.value})}
+                      onChange={(e) =>
+                        setRegisterData({
+                          ...registerData,
+                          lastName: e.target.value,
+                        })
+                      }
                       value={registerData.lastName}
                       className="w-full bg-[#171e30] border border-slate-700/50 rounded-xl py-2.5 px-4 text-white placeholder-slate-500 focus:outline-none focus:border-purple-500 text-sm"
                       required
@@ -161,10 +171,12 @@ export const Login = () => {
                   value={isLogin ? loginData.email : registerData.email}
                   className="w-full bg-[#171e30] border border-slate-700/40 rounded-xl py-3 pl-11 pr-4 text-white text-sm outline-none transition-all duration-200 placeholder-[#52525b] focus:border-[#a855f7] focus:ring-1 focus:ring-[#a855f7]"
                   onChange={(e) =>
-                    isLogin ? 
-                    setLoginData({ ...loginData, email: e.target.value }) :
-                    setRegisterData({...registerData,email: e.target.value})
-
+                    isLogin
+                      ? setLoginData({ ...loginData, email: e.target.value })
+                      : setRegisterData({
+                          ...registerData,
+                          email: e.target.value,
+                        })
                   }
                   required
                 />
@@ -185,7 +197,12 @@ export const Login = () => {
                     className="w-full bg-[#171e30] border border-slate-700/50 rounded-xl py-2.5 pl-10 pr-4 text-white placeholder-slate-500 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500/50 transition-all text-sm"
                     placeholder="Enter your GitHub Username"
                     value={registerData.gitHubUserName}
-                    onChange={(e)=>setRegisterData({...registerData, gitHubUserName : e.target.value})}
+                    onChange={(e) =>
+                      setRegisterData({
+                        ...registerData,
+                        gitHubUserName: e.target.value,
+                      })
+                    }
                     required
                   />
                 </div>
@@ -204,13 +221,16 @@ export const Login = () => {
                 <input
                   type={showPassword ? "text" : "password"}
                   placeholder="Enter your password"
-
-                  value={isLogin ? loginData.password : registerData.password }
+                  value={isLogin ? loginData.password : registerData.password}
+                  required
                   className="w-full bg-[#171e30] border border-slate-700/40 rounded-xl py-3 pl-11 pr-11 text-white text-sm outline-none transition-all duration-200 placeholder-[#52525b] focus:border-[#a855f7] focus:ring-1 focus:ring-[#a855f7]"
                   onChange={(e) =>
-                    isLogin ? 
-                    setLoginData({ ...loginData, password: e.target.value }) :
-                    setRegisterData({...registerData, password : e.target.value})
+                    isLogin
+                      ? setLoginData({ ...loginData, password: e.target.value })
+                      : setRegisterData({
+                          ...registerData,
+                          password: e.target.value,
+                        })
                   }
                 />
                 <button
@@ -238,8 +258,14 @@ export const Login = () => {
                     type={showPassword ? "text" : "password"}
                     placeholder="Enter your password"
                     value={registerData.confirmPassword}
-                    onChange={(e) => setRegisterData({...registerData, confirmPassword : e.target.value })}
+                    onChange={(e) =>
+                      setRegisterData({
+                        ...registerData,
+                        confirmPassword: e.target.value,
+                      })
+                    }
                     className="w-full bg-[#171e30] border border-slate-700/40 rounded-xl py-3 pl-11 pr-11 text-white text-sm outline-none transition-all duration-200 placeholder-[#52525b] focus:border-[#a855f7] focus:ring-1 focus:ring-[#a855f7]"
+                    required
                   />
                   <button
                     type="button"
