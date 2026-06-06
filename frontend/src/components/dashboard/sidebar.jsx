@@ -17,15 +17,15 @@ const Sidebar = () => {
   return (
     <>
       <button
-        className="md:hidden fixed top-4 left-4 z-50 p-2 bg-slate-800 text-white rounded-md"
+        className="md:hidden fixed top-4 right-4 z-50 p-2 bg-slate-800 text-white rounded-md"
         onClick={() => setOpen(!open)}
       >
         <Menu size={24} />
       </button>
 
       <aside
-        className={`fixed top-0 right-0 h-screen w-64 bg-slate-900 text-slate-100 border-l border-slate-800 transform transition-transform duration-300 z-40
-        ${open ? "translate-x-0" : "translate-x-full"} md:translate-x-0`}
+        className={`fixed top-0 left-0 h-screen w-64 bg-slate-900 text-slate-100 border-r border-slate-800 transform transition-transform duration-300 z-40
+        ${open ? "translate-x-0" : "-translate-x-full"} md:translate-x-0`}
       >
         <div className="flex items-center gap-3 px-6 h-16 border-b border-slate-800">
           <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-md flex items-center justify-center overflow-hidden">
