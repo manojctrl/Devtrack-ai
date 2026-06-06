@@ -1,6 +1,7 @@
 import Sidebar from "../../components/dashboard/sidebar";
 import Navbar from "../../components/dashboard/Navbar";
 import WelcomHero from "../../components/dashboard/WelcomHero";
+import StatesFlex from "../../components/dashboard/StatesFlex";
 
 const Dashboard = () => {
   return (
@@ -12,6 +13,8 @@ const Dashboard = () => {
         
         <main className="p-8 pt-24 max-w-7xl mx-auto space-y-8">
           <WelcomHero />
+          <StatesFlex />
+          
           
         </main>
 
