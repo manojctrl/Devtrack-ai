@@ -1,10 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
+import { Flame } from "lucide-react";
 
-const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-                 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-const DAYS   = ['', 'Mon', '', 'Wed', '', 'Fri', ''];
+const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const DAYS   = ["", "Mon", "", "Wed", "", "Fri", ""];
 
-// Generate 52 weeks × 7 days of dummy contribution data
 function generateData() {
   const weeks = [];
   for (let w = 0; w < 52; w++) {
@@ -17,21 +16,18 @@ function generateData() {
   }
   return weeks;
 }
-
 const WEEK_DATA = generateData();
 
-// GitHub green color stops
 const COLORS = {
-  0: { bg: '#161b22', border: '#1e2430' },
-  1: { bg: '#0e4429', border: '#145e39' },
-  2: { bg: '#006d32', border: '#008a3e' },
-  3: { bg: '#26a641', border: '#2fbd4d' },
-  4: { bg: '#39d353', border: '#45e861' },
+  0: { bg: "#161b22", border: "#21262d" },
+  1: { bg: "#0e4429", border: "#145e39" },
+  2: { bg: "#006d32", border: "#008a3e" },
+  3: { bg: "#26a641", border: "#2fbd4d" },
+  4: { bg: "#39d353", border: "#45e861" },
 };
 
 function getMonthLabels() {
   const labels = [];
-  // Place month label at the first week of each month (approx 4-5 weeks apart)
   const monthStarts = [0, 4, 9, 13, 18, 22, 26, 31, 35, 40, 44, 48];
   monthStarts.forEach((weekIdx, i) => {
     labels.push({ weekIdx, name: MONTHS[i] });
@@ -43,87 +39,70 @@ export default function ContributionHeatmap() {
   const [tooltip, setTooltip] = useState(null);
   const totalContributions = WEEK_DATA.flat().reduce((sum, v) => sum + v * 3, 0);
   const monthLabels = getMonthLabels();
-  const CELL = 13;
-  const GAP  = 3;
+
+  const CELL = 12;
+  const GAP  = 4;
   const STEP = CELL + GAP;
 
   return (
-    <div style={{
-      background: '#0d1117',
-      border: '1px solid #30363d',
-      borderRadius: 12,
-      padding: '20px 24px',
-      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
-      display: 'inline-block',
-      minWidth: 720,
-    }}>
+    <div className="w-full bg-[#1a2035] border border-gray-800/60 p-6 rounded-2xl shadow-lg">
 
       {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+      <div className="flex justify-between items-center mb-6">
         <div>
-          <div style={{ color: '#e6edf3', fontSize: 15, fontWeight: 600, marginBottom: 3 }}>
-            🔥 Coding Consistency
+          <div className="text-gray-100 text-base font-bold flex items-center gap-2">
+            <Flame className="w-4 h-4 text-orange-500 animate-pulse" />
+            Coding Consistency
           </div>
-          <div style={{ color: '#7d8590', fontSize: 12, fontFamily: 'monospace' }}>
-            {totalContributions} contributions in 2024
+          <div className="text-gray-400 text-xs mt-0.5">
+            {totalContributions.toLocaleString()} contributions in 2024
           </div>
         </div>
-        <div style={{
-          display: 'flex', alignItems: 'center', gap: 7,
-          padding: '5px 13px', borderRadius: 20,
-          background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.25)',
-          fontSize: 12, fontWeight: 600, color: '#3fb950',
-        }}>
-          <span style={{
-            width: 7, height: 7, borderRadius: '50%', background: '#3fb950',
-            boxShadow: '0 0 7px #3fb950',
-            animation: 'pulse 2s infinite',
-          }} />
+        <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-xs font-semibold text-emerald-400">
+          <span className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_#10b981] animate-pulse" />
           Active
         </div>
       </div>
 
-      {/* Graph */}
-      <div style={{ overflowX: 'auto' }}>
+      {/* Heatmap */}
+      <div className="flex justify-center pb-4">
         <svg
-          width={STEP * 53 + 28}
-          height={STEP * 7 + 26}
-          style={{ display: 'block' }}
+          width={(STEP * 53) + 32}
+          height={(STEP * 7) + 20}
+          className="max-w-full select-none"
         >
-          {/* Month labels */}
           {monthLabels.map(({ weekIdx, name }) => (
             <text
               key={name}
-              x={28 + weekIdx * STEP}
+              x={32 + (weekIdx * STEP)}
               y={10}
-              fill="#7d8590"
-              fontSize={11}
-              fontFamily="-apple-system, sans-serif"
+              fill="#9ca3af"
+              fontSize={10}
+              fontWeight={500}
+              fontFamily="sans-serif"
             >
               {name}
             </text>
           ))}
 
-          {/* Day labels */}
           {DAYS.map((day, i) => (
             <text
               key={i}
               x={0}
-              y={22 + i * STEP + CELL / 2 + 3}
-              fill="#7d8590"
-              fontSize={10}
-              fontFamily="-apple-system, sans-serif"
-              textAnchor="start"
+              y={18 + (i * STEP) + (CELL / 2) + 2}
+              fill="#6b7280"
+              fontSize={9}
+              fontWeight={500}
+              fontFamily="sans-serif"
             >
               {day}
             </text>
           ))}
 
-          {/* Cells */}
           {WEEK_DATA.map((week, wi) =>
             week.map((level, di) => {
-              const x = 28 + wi * STEP;
-              const y = 16 + di * STEP;
+              const x = 32 + (wi * STEP);
+              const y = 16 + (di * STEP);
               const col = COLORS[level];
               return (
                 <rect
@@ -136,20 +115,11 @@ export default function ContributionHeatmap() {
                   fill={col.bg}
                   stroke={col.border}
                   strokeWidth={0.5}
-                  style={{ cursor: 'pointer', transition: 'all 0.1s' }}
+                  className="cursor-pointer transition-transform duration-150 hover:scale-110 hover:shadow-md"
                   onMouseEnter={(e) => {
-                    e.currentTarget.setAttribute('opacity', '0.8');
-                    setTooltip({
-                      x: e.clientX,
-                      y: e.clientY,
-                      level,
-                      count: level * 3,
-                    });
+                    setTooltip({ x: e.clientX, y: e.clientY, count: level * 3 });
                   }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.setAttribute('opacity', '1');
-                    setTooltip(null);
-                  }}
+                  onMouseLeave={() => setTooltip(null)}
                 />
               );
             })
@@ -157,77 +127,47 @@ export default function ContributionHeatmap() {
         </svg>
       </div>
 
-      {/* Legend + total */}
-      <div style={{
-        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-        marginTop: 12, paddingTop: 12, borderTop: '1px solid #21262d',
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, color: '#7d8590' }}>
-          <span>Less</span>
-          {[0, 1, 2, 3, 4].map(l => (
-            <div key={l} style={{
-              width: 11, height: 11, borderRadius: 2,
-              background: COLORS[l].bg, border: `0.5px solid ${COLORS[l].border}`,
-            }} />
-          ))}
-          <span>More</span>
-        </div>
-        <span style={{ fontSize: 11, color: '#7d8590', fontFamily: 'monospace' }}>
-          2024
-        </span>
+      {/* Legend */}
+      <div className="flex justify-center items-center mt-3 pt-4 border-t border-gray-800/60 text-xs text-gray-400 gap-2">
+        <span>Less</span>
+        {[0, 1, 2, 3, 4].map((l) => (
+          <div
+            key={l}
+            className="w-[12px] h-[12px] rounded-[2px] transition-transform duration-200 hover:scale-110"
+            style={{
+              background: COLORS[l].bg,
+              border: `0.5px solid ${COLORS[l].border}`
+            }}
+          />
+        ))}
+        <span>More</span>
+        <span className="ml-4 font-mono text-gray-500">2024</span>
       </div>
 
-      {/* Bottom stats */}
-      <div style={{
-        display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)',
-        gap: 0, marginTop: 16, paddingTop: 16, borderTop: '1px solid #21262d',
-      }}>
+      {/* Stats */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6 pt-5 border-t border-gray-800/60">
         {[
-          { val: '14',  color: '#3fb950', label: 'day streak'          },
-          { val: '182', color: '#e6edf3', label: 'total contributions'  },
-          { val: '6',   color: '#e6edf3', label: 'days/week avg'        },
-          { val: 'Jun', color: '#818cf8', label: 'best month'           },
+          { val: "14", color: "text-emerald-400", label: "day streak" },
+          { val: "1,605", color: "text-gray-200", label: "total contributions" },
+          { val: "6", color: "text-gray-200", label: "days/week avg" },
+          { val: "Jun", color: "text-indigo-400", label: "best month" },
         ].map(({ val, color, label }) => (
-          <div key={label}>
-            <div style={{ fontSize: 20, fontWeight: 700, color, fontFamily: 'monospace', marginBottom: 3 }}>
-              {val}
-            </div>
-            <div style={{ fontSize: 11, color: '#7d8590', textTransform: 'uppercase', letterSpacing: '0.07em' }}>
-              {label}
-            </div>
+          <div key={label} className="bg-[#222b45]/30 p-3 rounded-xl border border-gray-800/30 text-center sm:text-left">
+            <div className={`text-lg font-bold font-mono tracking-tight ${color}`}>{val}</div>
+            <div className="text-xs font-bold text-gray-500 uppercase tracking-wider mt-0.5">{label}</div>
           </div>
         ))}
       </div>
 
       {/* Tooltip */}
       {tooltip && (
-        <div style={{
-          position: 'fixed',
-          left: tooltip.x + 12,
-          top: tooltip.y - 36,
-          background: '#1c2128',
-          border: '1px solid #30363d',
-          borderRadius: 6,
-          padding: '5px 10px',
-          fontSize: 12,
-          color: '#e6edf3',
-          pointerEvents: 'none',
-          zIndex: 9999,
-          whiteSpace: 'nowrap',
-          fontFamily: '-apple-system, sans-serif',
-        }}>
-          {tooltip.count === 0
-            ? 'No contributions'
-            : `${tooltip.count} contributions`}
+        <div
+          className="fixed bg-[#222b45] border border-gray-700 shadow-xl rounded-lg px-2.5 py-1.5 text-xs text-gray-200 pointer-events-none z-[9999] whitespace-nowrap font-medium"
+          style={{ left: tooltip.x + 12, top: tooltip.y - 40 }}
+        >
+          {tooltip.count === 0 ? "No contributions" : `${tooltip.count} contributions`}
         </div>
       )}
-
-      <style>{`
-        @keyframes pulse {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0.4; }
-        }
-      `}</style>
     </div>
   );
 }
