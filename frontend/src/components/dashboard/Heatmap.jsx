@@ -1,17 +1,16 @@
-import React, { useState } from "react";
+import  { useState } from "react";
 import { Flame } from "lucide-react"; 
 
 const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 const DAYS   = ["", "Mon", "", "Wed", "", "Fri", ""];
 
-// 52 Weeks * 7 Days ko realistic static data array matrix
 const STATIC_WEEK_DATA = [
   [0, 1, 0, 2, 1, 3, 0], [1, 2, 3, 0, 2, 4, 1], [2, 0, 1, 2, 3, 0, 0], [4, 3, 2, 1, 2, 0, 0], // Jan
   [1, 2, 0, 3, 4, 2, 1], [0, 1, 2, 2, 3, 4, 0], [2, 3, 4, 1, 0, 2, 1], [4, 4, 3, 2, 1, 0, 0], // Feb
   [0, 0, 1, 2, 3, 2, 1], [2, 3, 1, 0, 4, 3, 0], [4, 2, 3, 1, 2, 4, 1], [1, 2, 0, 3, 4, 0, 0], // Mar
   [2, 3, 4, 1, 0, 2, 1], [0, 1, 2, 3, 4, 2, 0], [1, 2, 3, 4, 3, 1, 1], [4, 3, 2, 1, 0, 2, 0], // Apr
   [3, 4, 4, 3, 2, 1, 0], [1, 2, 3, 0, 2, 4, 1], [0, 1, 2, 2, 3, 4, 0], [2, 3, 4, 1, 0, 2, 1], // May
-  [4, 4, 3, 4, 4, 3, 2], [3, 4, 4, 3, 4, 4, 1], [4, 3, 4, 4, 3, 4, 0], [4, 4, 4, 3, 4, 4, 2], // Jun (Best Month: High Intensity)
+  [4, 4, 3, 4, 4, 3, 2], [3, 4, 4, 3, 4, 4, 1], [4, 3, 4, 4, 3, 4, 0], [4, 4, 4, 3, 4, 4, 2], // Jun 
   [2, 3, 1, 0, 2, 1, 0], [0, 1, 2, 3, 1, 2, 0], [1, 2, 0, 2, 3, 1, 1], [3, 2, 1, 0, 1, 2, 0], // Jul
   [0, 1, 2, 3, 4, 2, 1], [2, 3, 1, 0, 2, 4, 0], [4, 2, 3, 1, 2, 3, 1], [1, 2, 0, 3, 4, 0, 0], // Aug
   [2, 3, 4, 1, 0, 2, 1], [0, 1, 2, 3, 4, 2, 0], [1, 2, 3, 4, 3, 1, 1], [4, 3, 2, 1, 0, 2, 0], // Sep
@@ -40,7 +39,6 @@ function getMonthLabels() {
 export default function ContributionHeatmap() {
   const [tooltip, setTooltip] = useState(null);
   
-  // Total contributions static real numeric calculate (Level * 3 commits factor standard pattern mapping)
   const totalContributions = 1605; 
   const monthLabels = getMonthLabels();
   
@@ -51,7 +49,6 @@ export default function ContributionHeatmap() {
   return (
     <div className="w-full bg-[#1a2035] border border-gray-800/60 p-6 rounded-2xl shadow-lg">
 
-      {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <div>
           <div className="text-gray-100 text-base font-bold flex items-center gap-2">
@@ -69,7 +66,6 @@ export default function ContributionHeatmap() {
         </div>
       </div>
 
-      {/* Scrollable Heatmap Graph */}
       <div className="overflow-x-auto pb-4 scrollbar-thin scrollbar-thumb-gray-800/80">
         <div className="min-w-[760px] flex flex-col justify-center">
           <svg
@@ -77,7 +73,6 @@ export default function ContributionHeatmap() {
             height={(STEP * 7) + 20}
             className="mx-auto select-none"
           >
-            {/* Month dynamic labels */}
             {monthLabels.map(({ weekIdx, name }) => (
               <text
                 key={name}
@@ -92,7 +87,6 @@ export default function ContributionHeatmap() {
               </text>
             ))}
 
-            {/* Y-Axis Day labels */}
             {DAYS.map((day, i) => (
               <text
                 key={i}
@@ -107,13 +101,11 @@ export default function ContributionHeatmap() {
               </text>
             ))}
 
-            {/* Render Static Matrix Elements */}
             {STATIC_WEEK_DATA.map((week, wi) =>
               week.map((level, di) => {
                 const x = 32 + (wi * STEP);
                 const y = 16 + (di * STEP);
                 const col = COLORS[level];
-                // Static custom dynamic calculation to display realistic commits inside tooltip trigger
                 const commitsCount = level === 0 ? 0 : level === 1 ? 2 : level === 2 ? 5 : level === 3 ? 9 : 14;
                 
                 return (
@@ -144,7 +136,6 @@ export default function ContributionHeatmap() {
         </div>
       </div>
 
-      {/* Legend */}
       <div className="flex justify-between items-center mt-3 pt-4 border-t border-gray-800/60 text-xs text-gray-400">
         <div className="flex items-center gap-1.5 select-none">
           <span>Less</span>
@@ -163,7 +154,6 @@ export default function ContributionHeatmap() {
         <span className="font-mono text-gray-500">2024</span>
       </div>
 
-      {/* Bottom Metrics Grid Layout */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6 pt-5 border-t border-gray-800/60">
         {[
           { val: "14", color: "text-emerald-400", label: "day streak" },
@@ -178,7 +168,6 @@ export default function ContributionHeatmap() {
         ))}
       </div>
 
-      {/* Tooltip Component */}
       {tooltip && (
         <div
           className="fixed bg-[#222b45] border border-gray-700 shadow-xl rounded-lg px-2.5 py-1.5 text-xs text-gray-200 pointer-events-none z-[9999] whitespace-nowrap font-medium"
