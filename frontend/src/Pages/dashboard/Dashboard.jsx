@@ -6,6 +6,7 @@ import Heatmap from "../../components/dashboard/Heatmap";
 import SkillsAiInsigts from "../../components/dashboard/SkillsAiInsigts";
 import ActivityAndProjects from "../../components/dashboard/ActivityAndProjects";
 import LearningRoadMapAndRecentActivity from "../../components/dashboard/LearningRoadMapAndRecentActivity";
+import DeveloperLevelAndQuickActions from "../../components/dashboard/DeveloperLevelAndQuickActions";
 
 
 const Dashboard = () => {
@@ -23,6 +24,7 @@ const Dashboard = () => {
           <SkillsAiInsigts />
           <ActivityAndProjects />
           <LearningRoadMapAndRecentActivity />
+          <DeveloperLevelAndQuickActions />
        
           
         </main>
