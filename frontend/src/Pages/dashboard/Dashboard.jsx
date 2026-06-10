@@ -5,6 +5,7 @@ import StatesFlex from "../../components/dashboard/StatesFlex";
 import Heatmap from "../../components/dashboard/Heatmap";
 import SkillsAiInsigts from "../../components/dashboard/SkillsAiInsigts";
 import ActivityAndProjects from "../../components/dashboard/ActivityAndProjects";
+import LearningRoadMapAndRecentActivity from "../../components/dashboard/LearningRoadMapAndRecentActivity";
 
 
 const Dashboard = () => {
@@ -21,6 +22,7 @@ const Dashboard = () => {
           <Heatmap />
           <SkillsAiInsigts />
           <ActivityAndProjects />
+          <LearningRoadMapAndRecentActivity />
        
           
         </main>
