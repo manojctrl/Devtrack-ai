@@ -3,6 +3,8 @@ import Navbar from "../../components/dashboard/Navbar";
 import WelcomHero from "../../components/dashboard/WelcomHero";
 import StatesFlex from "../../components/dashboard/StatesFlex";
 import Heatmap from "../../components/dashboard/Heatmap";
+import SkillsAiInsigts from "../../components/dashboard/SkillsAiInsigts";
+
 
 const Dashboard = () => {
   return (
@@ -16,7 +18,8 @@ const Dashboard = () => {
           <WelcomHero />
           <StatesFlex />
           <Heatmap />
-          
+          <SkillsAiInsigts />
+       
           
         </main>
 
