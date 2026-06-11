@@ -9,7 +9,7 @@ const Sidebar = () => {
   const menuItems = [
     { name: "Dashboard", icon: <House size={20} />, path: "/dashboard" },
     { name: "Profile", icon: <User size={20} />, path: "/profile" },
-    { name: "GitHub Analytics", icon: <FaGithub size={20} />, path: "/github" },
+    { name: "GitHub Analytics", icon: <FaGithub size={20} />, path: "/github-analytics" },
     { name: "Skills", icon: <Brain size={20} />, path: "/skills" },
     { name: "Resume", icon: <FileText size={20} />, path: "/resume" },
     { name: "Settings", icon: <Settings size={20} />, path: "/settings" },
