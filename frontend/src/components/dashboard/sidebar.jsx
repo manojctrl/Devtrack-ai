@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { NavLink } from "react-router-dom";
 import { House, User, Brain, FileText, Settings, Menu } from "lucide-react";
 import { FaGithub } from "react-icons/fa";
 
@@ -6,12 +7,12 @@ const Sidebar = () => {
   const [open, setOpen] = useState(false);
 
   const menuItems = [
-    { name: "Dashboard", icon: <House size={20} />, active: true },
-    { name: "Profile", icon: <User size={20} /> },
-    { name: "GitHub Analytics", icon: <FaGithub size={20} /> },
-    { name: "Skills", icon: <Brain size={20} /> },
-    { name: "Resume", icon: <FileText size={20} /> },
-    { name: "Settings", icon: <Settings size={20} /> },
+    { name: "Dashboard", icon: <House size={20} />, path: "/dashboard" },
+    { name: "Profile", icon: <User size={20} />, path: "/profile" },
+    { name: "GitHub Analytics", icon: <FaGithub size={20} />, path: "/github" },
+    { name: "Skills", icon: <Brain size={20} />, path: "/skills" },
+    { name: "Resume", icon: <FileText size={20} />, path: "/resume" },
+    { name: "Settings", icon: <Settings size={20} />, path: "/settings" },
   ];
 
   return (
@@ -42,18 +43,20 @@ const Sidebar = () => {
 
         <nav className="flex-1 px-4 py-6 space-y-1">
           {menuItems.map((item, index) => (
-            <a
+            <NavLink
               key={index}
-              href={`#${item.name.toLowerCase().replace(/\s+/g, "-")}`}
-              className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
-                item.active
-                  ? "bg-emerald-600 text-white shadow-lg shadow-emerald-900/20"
-                  : "text-slate-400 hover:bg-slate-800 hover:text-slate-200"
-              }`}
+              to={item.path}
+              className={({ isActive }) =>
+                `flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+                  isActive
+                    ? "bg-emerald-600 text-white shadow-lg shadow-emerald-900/20"
+                    : "text-slate-400 hover:bg-slate-800 hover:text-slate-200"
+                }`
+              }
             >
               {item.icon}
               {item.name}
-            </a>
+            </NavLink>
           ))}
         </nav>
       </aside>
