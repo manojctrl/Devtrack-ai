@@ -1,5 +1,6 @@
 import Navbar from "../../components/dashboard/Navbar";
 import Sidebar from "../../components/dashboard/sidebar";
+import ProfileSummary from "../../components/githubAnalytics/ProfileSummary";
 
 const GitHubAnalytics = () => {
   return (
@@ -7,7 +8,11 @@ const GitHubAnalytics = () => {
       <Sidebar />
       <div className="flex-1 pl-64">
         <Navbar />
+        <main className="p-8 pt-24 max-w-7xl mx-auto space-y-8">
+        <ProfileSummary />
+      </main>
       </div>
+      
     </div>
   );
 };
