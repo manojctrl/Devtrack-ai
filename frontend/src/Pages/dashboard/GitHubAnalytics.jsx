@@ -1,5 +1,6 @@
 import Navbar from "../../components/dashboard/Navbar";
 import Sidebar from "../../components/dashboard/sidebar";
+import CommitActivity from "../../components/githubAnalytics/CommitActivity";
 import ContributionOverview from "../../components/githubAnalytics/ContributionOverview";
 import LanguageDistribution from "../../components/githubAnalytics/LanguageDistribution";
 import ProfileSummary from "../../components/githubAnalytics/ProfileSummary";
@@ -24,6 +25,7 @@ const GitHubAnalytics = () => {
             </div>
           </div>
           <TopRepositories />
+          <CommitActivity />
         </main>
       </div>
     </div>
