@@ -4,6 +4,7 @@ import CommitActivity from "../../components/githubAnalytics/CommitActivity";
 import ContributionOverview from "../../components/githubAnalytics/ContributionOverview";
 import LanguageDistribution from "../../components/githubAnalytics/LanguageDistribution";
 import ProfileSummary from "../../components/githubAnalytics/ProfileSummary";
+import RepositoryTable from "../../components/githubAnalytics/RepositoryTable";
 import RepoStats from "../../components/githubAnalytics/RepoStats";
 import TopRepositories from "../../components/githubAnalytics/TopRepositories";
 
@@ -26,6 +27,7 @@ const GitHubAnalytics = () => {
           </div>
           <TopRepositories />
           <CommitActivity />
+          <RepositoryTable />
         </main>
       </div>
     </div>
