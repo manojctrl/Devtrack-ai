@@ -4,6 +4,7 @@ import ContributionOverview from "../../components/githubAnalytics/ContributionO
 import LanguageDistribution from "../../components/githubAnalytics/LanguageDistribution";
 import ProfileSummary from "../../components/githubAnalytics/ProfileSummary";
 import RepoStats from "../../components/githubAnalytics/RepoStats";
+import TopRepositories from "../../components/githubAnalytics/TopRepositories";
 
 const GitHubAnalytics = () => {
   return (
@@ -12,19 +13,19 @@ const GitHubAnalytics = () => {
       <div className="flex-1 pl-64">
         <Navbar />
         <main className="p-8 pt-24 max-w-7xl mx-auto space-y-8">
-        <ProfileSummary />
-        <RepoStats />
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-          <div className="lg:col-span-2">
-            <LanguageDistribution />
+          <ProfileSummary />
+          <RepoStats />
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+            <div className="lg:col-span-2">
+              <LanguageDistribution />
+            </div>
+            <div className="lg:col-span-3">
+              <ContributionOverview />
+            </div>
           </div>
-          <div className="lg:col-span-3">
-            <ContributionOverview />
-          </div>
-        </div>
-      </main>
+          <TopRepositories />
+        </main>
       </div>
-      
     </div>
   );
 };
