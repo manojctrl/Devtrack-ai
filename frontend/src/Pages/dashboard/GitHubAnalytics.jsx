@@ -1,5 +1,7 @@
 import Navbar from "../../components/dashboard/Navbar";
 import Sidebar from "../../components/dashboard/sidebar";
+import ContributionOverview from "../../components/githubAnalytics/ContributionOverview";
+import LanguageDistribution from "../../components/githubAnalytics/LanguageDistribution";
 import ProfileSummary from "../../components/githubAnalytics/ProfileSummary";
 import RepoStats from "../../components/githubAnalytics/RepoStats";
 
@@ -12,6 +14,14 @@ const GitHubAnalytics = () => {
         <main className="p-8 pt-24 max-w-7xl mx-auto space-y-8">
         <ProfileSummary />
         <RepoStats />
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+          <div className="lg:col-span-2">
+            <LanguageDistribution />
+          </div>
+          <div className="lg:col-span-3">
+            <ContributionOverview />
+          </div>
+        </div>
       </main>
       </div>
       
