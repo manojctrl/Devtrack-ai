@@ -1,6 +1,7 @@
 import Navbar from "../../components/dashboard/Navbar";
 import Sidebar from "../../components/dashboard/sidebar";
 import ProfileSummary from "../../components/githubAnalytics/ProfileSummary";
+import RepoStats from "../../components/githubAnalytics/RepoStats";
 
 const GitHubAnalytics = () => {
   return (
@@ -10,6 +11,7 @@ const GitHubAnalytics = () => {
         <Navbar />
         <main className="p-8 pt-24 max-w-7xl mx-auto space-y-8">
         <ProfileSummary />
+        <RepoStats />
       </main>
       </div>
       
