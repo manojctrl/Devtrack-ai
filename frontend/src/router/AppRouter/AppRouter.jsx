@@ -5,6 +5,7 @@ import Dashboard from "../../Pages/dashboard/Dashboard"
 import Profile from "../../Pages/dashboard/Profile"
 import GitHubAnalytics from "../../Pages/dashboard/GitHubAnalytics"
 import Skills from "../../Pages/dashboard/Skills"
+import Resume from "../../Pages/dashboard/Resume"
 
 const AppRouter = () => {
   return (
@@ -15,6 +16,8 @@ const AppRouter = () => {
         <Route  path="/profile" element={<Profile />}/>
         <Route path="/github-analytics" element={<GitHubAnalytics />}/> 
         <Route path="/skills" element={<Skills />} />
+        <Route path="/resume" element={<Resume />}/>
+
         
     </Routes>
   )
