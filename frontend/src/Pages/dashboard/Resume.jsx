@@ -8,7 +8,7 @@ const Resume = () => {
   const [activeTemplate, setActiveTemplate] = useState("professional");
 
   return (
-    <div className="min-h-screen bg-[#111625] flex text-gray-100 font-sans">
+    <div className="min-h-screen bg-slate-50 dark:bg-[#111625] flex text-slate-800 dark:text-gray-100 font-sans transition-colors duration-300">
       <Sidebar />
       <div className="flex-1 pl-64">
         <Navbar />
