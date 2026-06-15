@@ -6,7 +6,7 @@ const registerUser = async (req, res) => {
         const {firstName, lastName, email, githubUsername, password, } = req.body;
 
         
-        const existingUser = await User.finndOne({
+        const existingUser = await User.findOne({
             where : {email}, 
         });
 
@@ -23,7 +23,7 @@ const registerUser = async (req, res) => {
             lastName,
             email,
             githubUsername,
-            hashedPassword,
+            password:hashedPassword,
         });
 
 
@@ -33,7 +33,7 @@ const registerUser = async (req, res) => {
             user,
         })
     }catch(error){
-        req.status(500).json({
+        res.status(500).json({
             message:error.message,
         })
     }
