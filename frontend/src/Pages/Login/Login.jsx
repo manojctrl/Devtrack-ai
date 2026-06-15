@@ -1,7 +1,8 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Mail, Lock, EyeOff, Eye, ArrowLeft } from "lucide-react";
 import { useState } from "react";
 import { FaGithub } from "react-icons/fa";
+import axios from "axios"; 
 
 import {
   BarChart3,
@@ -20,6 +21,8 @@ export const Login = () => {
     password: "",
   });
 
+  const navigate = useNavigate();
+
   const [registerData, setRegisterData] = useState({
     firstName: "",
     lastName: "",
@@ -29,21 +32,34 @@ export const Login = () => {
     confirmPassword: "",
   });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (isLogin) {
-      console.log("login Data", loginData);
-      alert("Login Successfull");
-    } else {
-      // console.log("Register Data", registerData)
-      if (registerData.password !== registerData.confirmPassword) {
-        alert("Password do not match");
-        return;
+    try {
+      if (isLogin) {
+        const response = await axios.post("http://localhost:5000/api/auth/login", {
+          email: loginData.email,
+          password: loginData.password,
+        });
+
+        if (response.data) {
+          alert("Login successful!");
+          localStorage.setItem("token", response.data.token); 
+          navigate("/dashboard"); 
+        }
+      } else {
+        if (registerData.password !== registerData.confirmPassword) {
+          return alert("Passwords do not match!");
+        }
+        const response = await axios.post("http://localhost:5000/api/auth/register", registerData);
+        alert("Registration Successful! Please login.");
+        setIsLogin(true);
       }
-      console.log("registerData", registerData);
-      alert("Registerd successfull");
+    } catch (error) {
+      console.error("Authentication Failed", error);
+      alert(error.response?.data?.message || "Something went wrong!");
     }
   };
+
   return (
     <div className="min-h-screen flex items-center justify-center p-4 font-sans text-[#e2e8f0] box-border selection:bg-purple-500 selection:text-white bg-[#111625]">
       <div className="w-full max-w-[920px] bg-[#111625] rounded-[20px] border border-slate-700/50 overflow-hidden shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] flex flex-col md:flex-row relative">
@@ -81,6 +97,7 @@ export const Login = () => {
               <p className="text-sm text-[#94a3b8] mb-8">
                 New here?{" "}
                 <button
+                  type="button"
                   onClick={() => setIsLogin(false)}
                   className="text-purple-500 hover:underline font-medium"
                 >
@@ -101,6 +118,7 @@ export const Login = () => {
               <p className="text-sm text-[#94a3b8] mb-4">
                 Already have an Account?{" "}
                 <button
+                  type="button"
                   onClick={() => setIsLogin(true)}
                   className="text-purple-500 hover:underline font-medium"
                 >
@@ -156,7 +174,6 @@ export const Login = () => {
             )}
 
             {/* Email Address */}
-
             <div className="flex flex-col gap-1.5">
               <label className="text-sm font-medium text-[#94a3b8] uppercase">
                 Email Address
@@ -244,7 +261,6 @@ export const Login = () => {
             </div>
 
             {/* Confirm Password */}
-
             {!isLogin && (
               <div className="flex flex-col gap-1.5">
                 <label className="text-sm font-medium text-[#94a3b8] uppercase">
@@ -256,7 +272,7 @@ export const Login = () => {
                   </span>
                   <input
                     type={showPassword ? "text" : "password"}
-                    placeholder="Enter your password"
+                    placeholder="Confirm your password"
                     value={registerData.confirmPassword}
                     onChange={(e) =>
                       setRegisterData({
@@ -287,6 +303,8 @@ export const Login = () => {
                 : "Create your DevTrack profile"}
             </button>
           </form>
+
+          {/* Social login logic */}
           <div className="relative flex items-center justify-center my-6">
             <div className="border-t border-[#1e293b] w-full"></div>
             <span className="absolute bg-[#111625] px-3 text-xs text-[#64748b] uppercase tracking-wider">
@@ -301,7 +319,7 @@ export const Login = () => {
           </button>
         </div>
 
-        {/* Right Side */}
+        {/* Right Side UI Details */}
         <div className="w-full md:w-[48%] bg-[#141b2d] border-t md:border-t-0 md:border-l border-slate-700/50 p-8 md:p-12 flex flex-col justify-center gap-10">
           <div>
             <span className="text-[11px] font-bold text-slate-500 uppercase tracking-widest block mb-6">
@@ -309,7 +327,6 @@ export const Login = () => {
             </span>
 
             <div className="space-y-6">
-              {/* Feature 1 */}
               <div className="flex gap-4">
                 <div className="w-10 h-10 rounded-xl bg-[#1d263b] flex items-center justify-center text-slate-400 shrink-0">
                   <BarChart3 className="w-5 h-5" />
@@ -326,7 +343,6 @@ export const Login = () => {
                 </div>
               </div>
 
-              {/* Feature 2 */}
               <div className="flex gap-4">
                 <div className="w-10 h-10 rounded-xl bg-[#1d263b] flex items-center justify-center text-emerald-400 shrink-0">
                   {isLogin ? (
@@ -347,7 +363,6 @@ export const Login = () => {
                 </div>
               </div>
 
-              {/* Feature 3 */}
               <div className="flex gap-4">
                 <div className="w-10 h-10 rounded-xl bg-[#1d263b] flex items-center justify-center text-purple-400 shrink-0">
                   {isLogin ? (
@@ -370,12 +385,11 @@ export const Login = () => {
             </div>
           </div>
 
-          {/* Bottom Testimonial OR Social Proof */}
+          {/* Testimonials section */}
           {isLogin ? (
             <div className="border-t border-slate-800/80 pt-6 mt-8">
               <p className="text-xs italic text-slate-400 leading-relaxed">
-                "Got my first job offer 2 weeks after sharing my DevTrack
-                profile."
+                "Got my first job offer 2 weeks after sharing my DevTrack profile."
               </p>
               <div className="flex items-center gap-3 mt-4">
                 <div className="w-7 h-7 bg-purple-500 rounded-full flex items-center justify-center text-[10px] font-bold text-white">
@@ -405,9 +419,7 @@ export const Login = () => {
                   AP
                 </div>
               </div>
-              <p className="text-[11px] text-slate-400">
-                4.9 / 5 from 340 reviews
-              </p>
+              <p className="text-[11px] text-slate-400">4.9 / 5 from 340 reviews</p>
             </div>
           )}
         </div>

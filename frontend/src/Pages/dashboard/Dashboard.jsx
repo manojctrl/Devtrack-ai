@@ -9,7 +9,10 @@ import LearningRoadMapAndRecentActivity from "../../components/dashboard/Learnin
 import DeveloperLevelAndQuickActions from "../../components/dashboard/DeveloperLevelAndQuickActions";
 
 
+
 const Dashboard = () => {
+
+  
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-[#111625] flex text-slate-800 dark:text-gray-100 font-sans transition-colors duration-300">
       <Sidebar />

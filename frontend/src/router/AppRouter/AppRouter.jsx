@@ -7,18 +7,22 @@ import GitHubAnalytics from "../../Pages/dashboard/GitHubAnalytics"
 import Skills from "../../Pages/dashboard/Skills"
 import Resume from "../../Pages/dashboard/Resume"
 import Settings from "../../Pages/dashboard/Settings"
+import ProtectedRoute from "../../components/ProtectedRoute/ProtectedRoute"
 
 const AppRouter = () => {
   return (
     <Routes>
         <Route path="/" element={<Landing />} />
         <Route path="/auth" element={<Login />}/>
+
+        <Route element= {<ProtectedRoute/>}>
         <Route path="/dashboard" element={<Dashboard/>}/>
         <Route  path="/profile" element={<Profile />}/>
         <Route path="/github-analytics" element={<GitHubAnalytics />}/> 
         <Route path="/skills" element={<Skills />} />
         <Route path="/resume" element={<Resume />}/>
         <Route path="/settings" element={<Settings />}/>
+        </Route>
     </Routes>
   )
 }
