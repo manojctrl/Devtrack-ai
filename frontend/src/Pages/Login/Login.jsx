@@ -63,9 +63,7 @@ export const Login = () => {
   return (
     <div className="min-h-screen flex items-center justify-center p-4 font-sans text-[#e2e8f0] box-border selection:bg-purple-500 selection:text-white bg-[#111625]">
       <div className="w-full max-w-[920px] bg-[#111625] rounded-[20px] border border-slate-700/50 overflow-hidden shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] flex flex-col md:flex-row relative">
-        {/* Left Side */}
         <div className="w-full md:w-[52%] p-8 md:p-12 flex flex-col justify-center relative pt-16 md:pt-20">
-          {/* Back Button */}
           <Link
             to="/"
             className="absolute top-6 left-8 md:left-12 flex items-center gap-2 text-xs font-medium text-[#94a3b8] hover:text-[#c084fc] transition-colors duration-200 group"
@@ -77,7 +75,6 @@ export const Login = () => {
             <span className="">Back</span>
           </Link>
 
-          {/* Logo Area */}
           <div className="flex items-center gap-2.5 mb-8">
             <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-lg flex items-center justify-center overflow-hidden text-white">
               <img
