@@ -1,10 +1,34 @@
 import { User, FileText } from "lucide-react";
+import { useContext } from "react";
+import { AuthContext } from "../../context/AuthContext";
 const WelcomeHero = () => {
+  const {user, loading} = useContext(AuthContext);
+
+  const displayName = user?.firstName || user?.name?.split(" ")[0] || "Developer"
+  if (loading) {
+    return (
+      <div className="w-full h-48 bg-slate-900 border border-slate-800 rounded-2xl animate-pulse" />
+    );
+  }
+
+  const getInitials = (user) => {
+    if (!user) return "DV";
+    if (user.firstName || user.lastName) {
+      const first = user.firstName ? user.firstName[0] : "";
+      const last = user.lastName ? user.lastName[0] : "";
+      return (first + last).toUpperCase();
+    }
+    if (user.name) {
+      return user.name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2);
+    }
+    return "DV";
+  };
   return (
     <div className="relative bg-slate-900 border border-slate-800 rounded-2xl p-7 md:p-8 flex flex-col md:flex-row justify-between items-center gap-6 overflow-hidden shadow-xl  bg-[radial-gradient(ellipse_at_80%_50%,rgba(99,102,241,0.12),transparent_60%)]">
       <div className="flex-1 text-center md:text-left">
         <h1 className="text-2xl md:text-3xl font-bold text-white tracking-tight mb-2">
-          👋 Welcome Back, Manoj
+
+          👋 Welcome Back, {displayName}
         </h1>
         <p className="text-sm font-light text-slate-400 line-height-relaxed max-w-lg mb-5">
           Track your coding journey, analyze your skills, and grow your
@@ -53,14 +77,14 @@ const WelcomeHero = () => {
           </svg>
 
           <div className="absolute inset-2 rounded-full flex items-center justify-center text-xl font-bold text-white shadow-inner  bg-gradient-to-br from-indigo-500 to-purple-600">
-            MK
+            {getInitials(user)}
           </div>
         </div>
 
         <div className="flex flex-col items-center gap-0.5 px-4 py-1.5 rounded-full border border-indigo-500/20 bg-indigo-500/10">
-          <span className="text-xs font-bold text-indigo-400">Level 8</span>
+          <span className="text-xs font-bold text-indigo-400">{user?.level ? `Level ${user.level}` : "Level 1"}</span>
           <span className="text-[9px] font-mono tracking-wider uppercase text-slate-500">
-            Developer
+            {user?.role || "Developer"}
           </span>
         </div>
       </div>
