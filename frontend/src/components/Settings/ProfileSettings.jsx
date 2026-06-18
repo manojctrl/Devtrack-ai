@@ -1,4 +1,3 @@
-import React from "react";
 import { MapPin, Globe, FileText, Upload, Check } from "lucide-react";
 import { FaGithub, FaLinkedin } from "react-icons/fa";
 

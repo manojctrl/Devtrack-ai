@@ -1,52 +1,75 @@
 import { 
-  IconStack2, 
-  IconTrophy, 
-  IconChartBar, 
-  IconSeedling, 
-  IconTrendingUp 
-} from '@tabler/icons-react';
+  Layers, 
+  Trophy, 
+  BarChart2, 
+  Sprout, 
+  TrendingUp 
+} from "lucide-react";
+import { useMemo } from "react";
 
-const SkillOverview = () => {
+const SkillOverview = ({ profile }) => {
+  const { totalSkills, advanced, intermediate, beginner } = useMemo(() => {
+    const langs = profile?.languages || {};
+    const entries = Object.entries(langs);
+    
+    let advCount = 0;
+    let intCount = 0;
+    let begCount = 0;
+
+    entries.forEach(([_, count]) => {
+      if (count >= 5) advCount++;
+      else if (count >= 2) intCount++;
+      else begCount++;
+    });
+
+    return {
+      totalSkills: entries.length || 5, // fallback if empty
+      advanced: entries.length ? advCount : 2,
+      intermediate: entries.length ? intCount : 2,
+      beginner: entries.length ? begCount : 1,
+    };
+  }, [profile]);
+
   const skillsStats = [
     {
-      val: '12',
-      label: 'Total Skills',
-      sub: 'tracked technologies',
-      trend: '+2',
-      colorClass: 'text-indigo-400',
-      bgColor: 'bg-indigo-600/10',
-      borderColor: 'border-indigo-500/20',
-      icon: <IconStack2 className="w-5 h-5 text-indigo-400" />
+      val: totalSkills.toString(),
+      label: "Total Technologies",
+      sub: "Tracked from repos",
+      trend: "Active",
+      colorClass: "text-indigo-400",
+      bgColor: "bg-indigo-600/10",
+      borderColor: "border-indigo-500/20",
+      icon: <Layers className="w-5 h-5 text-indigo-400" />
     },
     {
-      val: '4',
-      label: 'Advanced',
-      sub: '80%+ proficiency',
-      trend: '+1',
-      colorClass: 'text-emerald-400',
-      bgColor: 'bg-emerald-500/10',
-      borderColor: 'border-emerald-500/20',
-      icon: <IconTrophy className="w-5 h-5 text-emerald-400" />
+      val: advanced.toString(),
+      label: "Advanced Core",
+      sub: "5+ repositories",
+      trend: "Stable",
+      colorClass: "text-emerald-400",
+      bgColor: "bg-emerald-500/10",
+      borderColor: "border-emerald-500/20",
+      icon: <Trophy className="w-5 h-5 text-emerald-400" />
     },
     {
-      val: '5',
-      label: 'Intermediate',
-      sub: '50–79% proficiency',
-      trend: '+2',
-      colorClass: 'text-amber-400',
-      bgColor: 'bg-amber-500/10',
-      borderColor: 'border-amber-500/20',
-      icon: <IconChartBar className="w-5 h-5 text-amber-400" />
+      val: intermediate.toString(),
+      label: "Intermediate Tech",
+      sub: "2-4 repositories",
+      trend: "Growing",
+      colorClass: "text-amber-400",
+      bgColor: "bg-amber-500/10",
+      borderColor: "border-amber-500/20",
+      icon: <BarChart2 className="w-5 h-5 text-amber-400" />
     },
     {
-      val: '3',
-      label: 'Beginner',
-      sub: 'currently learning',
-      trend: '+1',
-      colorClass: 'text-purple-400',
-      bgColor: 'bg-purple-500/10',
-      borderColor: 'border-purple-500/20',
-      icon: <IconSeedling className="w-5 h-5 text-purple-400" />
+      val: beginner.toString(),
+      label: "Beginner / Exploring",
+      sub: "1 repository",
+      trend: "New",
+      colorClass: "text-purple-400",
+      bgColor: "bg-purple-500/10",
+      borderColor: "border-purple-500/20",
+      icon: <Sprout className="w-5 h-5 text-purple-400" />
     }
   ];
 
@@ -62,7 +85,7 @@ const SkillOverview = () => {
               {stat.icon}
             </div>
             <div className="flex items-center gap-1 text-xs font-semibold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-md">
-              <IconTrendingUp className="w-3.5 h-3.5" />
+              <TrendingUp className="w-3.5 h-3.5" />
               <span>{stat.trend}</span>
             </div>
           </div>

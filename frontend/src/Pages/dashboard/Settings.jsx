@@ -1,5 +1,7 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useMemo, useRef, useState, useEffect } from "react";
 import { useTheme } from "../../context/ThemeContext";
+import { useAuth } from "../../context/AuthContext";
+import API from "../../services/api";
 import Sidebar from "../../components/dashboard/sidebar";
 import Navbar from "../../components/dashboard/Navbar";
 
@@ -16,6 +18,7 @@ import DangerZone from "../../components/Settings/DangerZone";
 const Settings = () => {
   const { theme, setTheme, accentColor, setAccentColor, getAccentClass } =
     useTheme();
+  const { setUser } = useAuth();
 
   // Active Tab state
   const [activeTab, setActiveTab] = useState("account");
@@ -29,22 +32,47 @@ const Settings = () => {
 
   // Account Settings state
   const [account, setAccount] = useState({
-    firstName: "Manoj",
-    lastName: "Katwal",
-    email: "manoj@devtrack.ai",
+    firstName: "",
+    lastName: "",
+    email: "",
   });
 
   // Profile Settings state
   const [profile, setProfile] = useState({
-    github: "manojkatwal",
-    bio: "Full Stack Developer passionate about building intelligent agentic systems and developer productivity tools.",
-    location: "Kathmandu, Nepal",
-    portfolio: "https://manoj.dev",
-    linkedin: "", // Missing initially to show 80% completion
+    github: "",
+    bio: "",
+    location: "",
+    portfolio: "",
+    linkedin: "",
   });
 
+  // Fetch initial profile values on mount
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const res = await API.get("/user/me");
+        const data = res.data;
+        setAccount({
+          firstName: data.firstName || "",
+          lastName: data.lastName || "",
+          email: data.email || "",
+        });
+        setProfile({
+          github: data.githubUsername || "",
+          bio: data.bio || "",
+          location: data.location || "",
+          portfolio: data.website || "",
+          linkedin: data.linkedin || "",
+        });
+      } catch (err) {
+        console.error("Failed to load user settings:", err);
+      }
+    };
+    fetchUserData();
+  }, []);
+
   // Resume file state
-  const [resumeFile, setResumeFile] = useState(null); // Missing initially
+  const [resumeFile, setResumeFile] = useState(null);
 
   // Security Settings state
   const [security, setSecurity] = useState({
@@ -54,7 +82,7 @@ const Settings = () => {
   });
 
   // 2FA state
-  const [twoFactor, setTwoFactor] = useState(false);
+  const [twoFactor] = useState(false);
 
   // Notifications state
   const [notifications, setNotifications] = useState({
@@ -77,14 +105,11 @@ const Settings = () => {
 
   // Profile strength calculation
   // Total 9 items: firstName (10%), lastName (10%), email (15%), github (15%), bio (10%), location (10%), portfolio (10%), linkedin (10%), resume (10%)
-  const [strength, setStrength] = useState(80);
-  const [missingItems, setMissingItems] = useState([]);
-
-  useEffect(() => {
+  const { strength, missingItems } = useMemo(() => {
     let score = 0;
     const missing = [];
 
-    if (account.firstName.trim()) score += 10;
+    if (account.firstName && account.firstName.trim()) score += 10;
     else
       missing.push({
         label: "First Name",
@@ -92,14 +117,14 @@ const Settings = () => {
         field: "firstName",
       });
 
-    if (account.lastName.trim()) score += 10;
+    if (account.lastName && account.lastName.trim()) score += 10;
     else
       missing.push({ label: "Last Name", tab: "account", field: "lastName" });
 
-    if (account.email.trim()) score += 15;
+    if (account.email && account.email.trim()) score += 15;
     else missing.push({ label: "Email", tab: "account", field: "email" });
 
-    if (profile.github.trim()) score += 15;
+    if (profile.github && profile.github.trim()) score += 15;
     else
       missing.push({
         label: "GitHub Username",
@@ -107,14 +132,14 @@ const Settings = () => {
         field: "github",
       });
 
-    if (profile.bio.trim()) score += 10;
+    if (profile.bio && profile.bio.trim()) score += 10;
     else missing.push({ label: "Bio", tab: "profile", field: "bio" });
 
-    if (profile.location.trim()) score += 10;
+    if (profile.location && profile.location.trim()) score += 10;
     else
       missing.push({ label: "Location", tab: "profile", field: "location" });
 
-    if (profile.portfolio.trim()) score += 10;
+    if (profile.portfolio && profile.portfolio.trim()) score += 10;
     else
       missing.push({
         label: "Portfolio URL",
@@ -122,7 +147,7 @@ const Settings = () => {
         field: "portfolio",
       });
 
-    if (profile.linkedin.trim()) score += 10;
+    if (profile.linkedin && profile.linkedin.trim()) score += 10;
     else
       missing.push({
         label: "LinkedIn URL",
@@ -133,26 +158,50 @@ const Settings = () => {
     if (resumeFile) score += 10;
     else missing.push({ label: "Resume", tab: "profile", field: "resume" });
 
-    setStrength(score);
-    setMissingItems(missing);
+    return { strength: score, missingItems: missing };
   }, [account, profile, resumeFile]);
 
   // Form submit handlers
-  const handleAccountSubmit = (e) => {
+  const handleAccountSubmit = async (e) => {
     e.preventDefault();
     if (!account.firstName || !account.lastName || !account.email) {
       triggerToast("Please fill in all required account fields.", "error");
       return;
     }
-    triggerToast("Account information saved successfully!");
+    try {
+      const res = await API.put("/user/profile", {
+        firstName: account.firstName,
+        lastName: account.lastName,
+      });
+      setUser(res.data.user);
+      localStorage.setItem("user", JSON.stringify(res.data.user));
+      triggerToast("Account information saved successfully!");
+    } catch (err) {
+      console.error(err);
+      triggerToast(err.response?.data?.message || "Failed to save account settings.", "error");
+    }
   };
 
-  const handleProfileSubmit = (e) => {
+  const handleProfileSubmit = async (e) => {
     e.preventDefault();
-    triggerToast("Profile settings updated successfully!");
+    try {
+      const res = await API.put("/user/profile", {
+        githubUsername: profile.github,
+        bio: profile.bio,
+        location: profile.location,
+        website: profile.portfolio,
+        linkedin: profile.linkedin,
+      });
+      setUser(res.data.user);
+      localStorage.setItem("user", JSON.stringify(res.data.user));
+      triggerToast("Profile settings updated successfully!");
+    } catch (err) {
+      console.error(err);
+      triggerToast(err.response?.data?.message || "Failed to update profile settings.", "error");
+    }
   };
 
-  const handleSecuritySubmit = (e) => {
+  const handleSecuritySubmit = async (e) => {
     e.preventDefault();
     if (!security.currentPassword) {
       triggerToast("Current password is required.", "error");
@@ -166,12 +215,21 @@ const Settings = () => {
       triggerToast("New password must be at least 6 characters.", "error");
       return;
     }
-    triggerToast("Password changed successfully!");
-    setSecurity({
-      currentPassword: "",
-      newPassword: "",
-      confirmPassword: "",
-    });
+    try {
+      await API.put("/user/change-password", {
+        currentPassword: security.currentPassword,
+        newPassword: security.newPassword,
+      });
+      triggerToast("Password changed successfully!");
+      setSecurity({
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+      });
+    } catch (err) {
+      console.error(err);
+      triggerToast(err.response?.data?.message || "Failed to change password.", "error");
+    }
   };
 
   const handleDeleteAccount = () => {

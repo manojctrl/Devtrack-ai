@@ -1,77 +1,103 @@
 import { Cpu, Check, Container, Cloud, GitMerge, Network } from "lucide-react";
 import { ChartColumn } from "lucide-react";
+import { useMemo } from "react";
 
-const SkillsAiInsigts = () => {
-  const skillsData = [
-    {
-      name: "Java",
-      pct: "90%",
-      color: "#818CF8",
-      fromColor: "#6366F1",
-      toColor: "#818CF8",
-    },
-    {
-      name: "MySQL",
-      pct: "80%",
-      color: "#34D399",
-      fromColor: "#10B981",
-      toColor: "#34D399",
-    },
-    {
-      name: "React",
-      pct: "75%",
-      color: "#C084FC",
-      fromColor: "#A855F7",
-      toColor: "#C084FC",
-    },
-    {
-      name: "Node.js",
-      pct: "60%",
-      color: "#FCD34D",
-      fromColor: "#F59E0B",
-      toColor: "#FCD34D",
-    },
-    {
-      name: "Spring Boot",
-      pct: "55%",
-      color: "#F87171",
-      fromColor: "#F43F5E",
-      toColor: "#F87171",
-    },
-  ];
-  const nextSkills = [
-    { name: "Docker", icon: Container },
-    { name: "AWS", icon: Cloud },
-    { name: "CI/CD", icon: GitMerge },
-    { name: "REST APIs", icon: Network },
-  ];
+const LANGUAGE_COLORS = {
+  JavaScript: { color: "#818CF8", fromColor: "#6366F1", toColor: "#818CF8" },
+  TypeScript: { color: "#38BDF8", fromColor: "#0284C7", toColor: "#38BDF8" },
+  Python: { color: "#34D399", fromColor: "#10B981", toColor: "#34D399" },
+  HTML: { color: "#F87171", fromColor: "#F43F5E", toColor: "#F87171" },
+  CSS: { color: "#C084FC", fromColor: "#A855F7", toColor: "#C084FC" },
+  Java: { color: "#FB923C", fromColor: "#EA580C", toColor: "#FB923C" },
+  Go: { color: "#22D3EE", fromColor: "#0891B2", toColor: "#22D3EE" },
+  Ruby: { color: "#F43F5E", fromColor: "#BE123C", toColor: "#F43F5E" },
+  PHP: { color: "#A78BFA", fromColor: "#7C3AED", toColor: "#A78BFA" },
+};
+
+const DEFAULT_COLOR = { color: "#A1A1AA", fromColor: "#71717A", toColor: "#A1A1AA" };
+
+const SkillsAiInsigts = ({ profile, aiRecommendations, onTriggerAnalysis }) => {
+  // 1. Calculate top languages from profile languages
+  const skillsData = useMemo(() => {
+    if (!profile || !profile.languages) {
+      // Return fallback dummy data if not synced
+      return [
+        { name: "JavaScript", pct: "75%", ...LANGUAGE_COLORS.JavaScript },
+        { name: "TypeScript", pct: "60%", ...LANGUAGE_COLORS.TypeScript },
+        { name: "Python", pct: "40%", ...LANGUAGE_COLORS.Python },
+      ];
+    }
+
+    const langs = Object.entries(profile.languages);
+    if (langs.length === 0) {
+      return [{ name: "No data", pct: "0%", ...DEFAULT_COLOR }];
+    }
+
+    const total = langs.reduce((sum, [_, count]) => sum + count, 0);
+
+    return langs
+      .map(([name, count]) => {
+        const percentage = Math.round((count / total) * 100);
+        const col = LANGUAGE_COLORS[name] || DEFAULT_COLOR;
+        return {
+          name,
+          pct: `${percentage}%`,
+          pctVal: percentage,
+          ...col,
+        };
+      })
+      .sort((a, b) => b.pctVal - a.pctVal)
+      .slice(0, 5);
+  }, [profile]);
+
+  // 2. Parse AI recommendations
+  const topLanguage = skillsData[0]?.name || "coding";
+
+  const recommendedRole = aiRecommendations?.roleSuggestions?.[0]
+    ? `${aiRecommendations.roleSuggestions[0].role} (${aiRecommendations.roleSuggestions[0].matchPercentage}% match)`
+    : "Full Stack Developer";
+
+  const summaryMessage = aiRecommendations?.roleSuggestions?.[0]?.reason || 
+    `You are currently strongest in ${topLanguage}. Expand your portfolio with backend projects to balance your full stack presence.`;
+
+  const nextSkills = useMemo(() => {
+    if (aiRecommendations?.learningRoadmap && aiRecommendations.learningRoadmap.length > 0) {
+      return aiRecommendations.learningRoadmap.map((item) => ({
+        name: item.topic,
+        icon: Cpu,
+      }));
+    }
+    return [
+      { name: "Docker", icon: Container },
+      { name: "AWS", icon: Cloud },
+      { name: "CI/CD", icon: GitMerge },
+      { name: "REST APIs", icon: Network },
+    ];
+  }, [aiRecommendations]);
+
   return (
-    <div className="  flex  flex-col md:flex-row gap-5 w-full text-text1 font-sora rounded-2xl">
-      <div className="flex-1 bg-card border border-white/5 rounded-r p-5  shadow-lg bg-[#1a2035]">
-        <div className="  flex  justify-between items-start  mb-4">
+    <div className="flex flex-col md:flex-row gap-5 w-full text-text1 font-sora rounded-2xl">
+      {/* Skills Overview */}
+      <div className="flex-1 bg-card border border-white/5 rounded-r p-5 shadow-lg bg-[#1a2035] rounded-2xl">
+        <div className="flex justify-between items-start mb-4">
           <div>
-            <div className="text-[15px] font-semibold  flex items-center gap-2 ">
-              <ChartColumn className="w-4 h-4 text-brand-indigo" /> Skills
-              Overview
+            <div className="text-[15px] font-semibold flex items-center gap-2 text-white">
+              <ChartColumn className="w-4 h-4 text-indigo-400" /> Skills Overview
             </div>
-            <div className="text-[11px] text-text2 font-mono mt-0.5">
-              Auto Calcualted from GitHub repos
+            <div className="text-[11px] text-slate-400 font-mono mt-0.5">
+              Auto Calculated from GitHub repos
             </div>
           </div>
-          <button className="border border-white/10 text-text1 rounded px-3.5 py-1.5 text-xs font-medium hover:bg-white/5 transition-colors">
-            {" "}
-            Analyse All
-          </button>
         </div>
         <div className="flex flex-col gap-[18px]">
           {skillsData.map((skill, index) => (
             <div key={index}>
               <div className="flex justify-between items-center mb-2">
-                <span className="text-xs font-medium text-text1">
+                <span className="text-xs font-medium text-slate-350 text-slate-300">
                   {skill.name}
                 </span>
                 <span
-                  className="text-xs font-semibold font-mono "
+                  className="text-xs font-semibold font-mono"
                   style={{ color: skill.color }}
                 >
                   {skill.pct}
@@ -90,37 +116,47 @@ const SkillsAiInsigts = () => {
           ))}
         </div>
       </div>
-      <div className="flex-1 bg-card border border-white/5 rounded-r p-5  shadow-lg bg-[#1a2035] rounded-2xl">
-        <div className="flex items-center gap-2.5 mb-5">
-          <div className="w-10 h-10 rounded-[11px] bg-brand-purple-dim border border-purple/20 flex items-center justify-center text-purple">
-            <Cpu className="w-5 h-5 animate-pulse" />
-          </div>
-          <div>
-            <div className="text-[15px] font-semibold text-text1">
-              AI Career Insights
+
+      {/* AI Career Insights */}
+      <div className="flex-1 bg-card border border-white/5 rounded-r p-5 shadow-lg bg-[#1a2035] rounded-2xl">
+        <div className="flex items-center justify-between mb-5">
+          <div className="flex items-center gap-2.5">
+            <div className="w-10 h-10 rounded-[11px] bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400">
+              <Cpu className="w-5 h-5 animate-pulse" />
             </div>
-            <div className="text-[11px] text-text2 font-mono">
-              Powered by Gemini · Updated today
+            <div>
+              <div className="text-[15px] font-semibold text-white">
+                AI Career Insights
+              </div>
+              <div className="text-[11px] text-slate-400 font-mono">
+                Powered by Gemini · Auto Generated
+              </div>
             </div>
           </div>
+          {onTriggerAnalysis && (
+            <button 
+              onClick={onTriggerAnalysis}
+              className="border border-indigo-500/30 text-indigo-400 rounded-lg px-3 py-1.5 text-xs font-semibold hover:bg-indigo-500/10 transition-colors cursor-pointer"
+            >
+              Analyze Profile
+            </button>
+          )}
         </div>
 
-        <div className="p-3 px-4 rounded-r bg-brand-indigo-dim border border-indigo/15 text-xs text-[#A5B4FC] mb-4 leading-relaxed">
-          You are currently strongest in{" "}
-          <span className="font-bold text-[#818CF8]">Java</span>. Your backend
-          skills are production-ready.
+        <div className="p-3 px-4 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-xs text-[#A5B4FC] mb-4 leading-relaxed">
+          {summaryMessage}
         </div>
 
-        <div className="p-3.5 px-4 rounded-r bg-brand-emerald-dim border border-emerald/15 mb-4">
-          <div className="text-[11px] text-text2 uppercase tracking-widest font-mono mb-1.5">
+        <div className="p-3.5 px-4 rounded-xl bg-emerald-500/10 border border-emerald-500/25 mb-4">
+          <div className="text-[11px] text-slate-400 uppercase tracking-widest font-mono mb-1.5">
             Recommended Role
           </div>
           <div className="text-sm font-semibold text-[#34D399] flex items-center gap-1.5">
-            <Check className="w-4 h-4 stroke-[3]" /> Junior Full Stack Developer
+            <Check className="w-4 h-4 stroke-[3]" /> {recommendedRole}
           </div>
         </div>
 
-        <div className="text-[11px] text-text2 uppercase tracking-widest font-mono mb-2.5">
+        <div className="text-[11px] text-slate-400 uppercase tracking-widest font-mono mb-2.5">
           Next skills to learn
         </div>
         <div className="flex flex-wrap gap-1.5">
@@ -129,7 +165,7 @@ const SkillsAiInsigts = () => {
             return (
               <span
                 key={index}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-brand-purple-dim border border-purple/15 text-xs font-medium text-[#C084FC]"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-purple-500/10 border border-purple-500/15 text-xs font-medium text-[#C084FC]"
               >
                 <IconComponent className="w-3.5 h-3.5" /> {skill.name}
               </span>

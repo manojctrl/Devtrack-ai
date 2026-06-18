@@ -1,6 +1,6 @@
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken")
+const jwt = require("jsonwebtoken");
 
 const login = async (req, res) => {
   try {
@@ -20,7 +20,7 @@ const login = async (req, res) => {
 
     if (!isMatch) {
       return res.status(400).json({
-        message: "Invalid credientials",
+        message: "Invalid credentials",
       });
     }
     const token = jwt.sign(

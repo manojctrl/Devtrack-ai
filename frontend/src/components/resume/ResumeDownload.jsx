@@ -5,7 +5,27 @@ const ACTIONS = [
   { icon: 'ti-copy',          label: 'Copy Share URL',    style: 'bg-white/4 border-white/7 text-slate-300 hover:bg-white/7 hover:text-slate-100' },
 ]
 
-export default function ResumeDownload() {
+export default function ResumeDownload({
+  onDownloadPdf,
+  onSharePublicLink,
+  onFullPreview,
+  onCopyShareUrl
+}) {
+  const getHandler = (label) => {
+    switch (label) {
+      case 'Download PDF':
+        return onDownloadPdf;
+      case 'Share Public Link':
+        return onSharePublicLink;
+      case 'Full Preview':
+        return onFullPreview;
+      case 'Copy Share URL':
+        return onCopyShareUrl;
+      default:
+        return undefined;
+    }
+  };
+
   return (
     <div className="bg-[#1E293B] border border-white/7 rounded-[20px] p-5">
       <div className="text-[13px] font-semibold text-slate-400 uppercase tracking-[0.08em] mb-4 flex items-center gap-1.5">
@@ -15,7 +35,8 @@ export default function ResumeDownload() {
         {ACTIONS.map((a) => (
           <button
             key={a.label}
-            className={`w-full flex items-center justify-center gap-2 py-3 rounded-[10px] text-[13px] font-semibold border transition-all duration-200 ${a.style}`}
+            onClick={getHandler(a.label)}
+            className={`w-full flex items-center justify-center gap-2 py-3 rounded-[10px] text-[13px] font-semibold border cursor-pointer transition-all duration-200 ${a.style}`}
           >
             <i className={`ti ${a.icon}`} />
             {a.label}

@@ -4,40 +4,40 @@ import { CiStar } from "react-icons/ci";
 import { FaUsers } from "react-icons/fa6";
 import { TrendingUp } from "lucide-react";
 
-const StatesFlex = () => {
+const StatesFlex = ({ profile }) => {
   const statsData = [
     {
       id: 1,
-      value: "24",
+      value: profile ? profile.publicRepos : "0",
       label: "Repositories",
-      subText: "+3 this month",
+      subText: "Synced with GitHub",
       textColor: "text-indigo-400",
       icon: <IoIosGitBranch className="text-indigo-400" />,
       iconBg: "bg-indigo-500/10 border-indigo-500/20",
     },
     {
       id: 2,
-      value: "1123",
+      value: profile ? profile.totalCommits : "0",
       label: "Total commits",
-      subText: "+87 this week",
+      subText: "Contributions tracked",
       textColor: "text-indigo-400",
       icon: <LuGitCommitVertical className="text-indigo-400" />,
       iconBg: "bg-indigo-500/10 border-indigo-500/20",
     },
     {
       id: 3,
-      value: "75",
+      value: profile ? profile.totalStars : "0",
       label: "Stars Earned",
-      subText: "across all repos",
+      subText: "Across all repos",
       textColor: "text-amber-400",
       icon: <CiStar size={20} className="text-amber-400" />,
       iconBg: "bg-amber-500/10 border-amber-500/20",
     },
     {
       id: 4,
-      value: "120",
+      value: profile ? profile.followers : "0",
       label: "Followers",
-      subText: "+12 this month",
+      subText: "GitHub community",
       textColor: "text-purple-400",
       icon: <FaUsers size={20} className="text-purple-400" />,
       iconBg: "bg-purple-500/10 border-purple-500/20",

@@ -60,6 +60,13 @@ export const Login = () => {
     }
   };
 
+  const handleGithubLogin = () => {
+    const clientId = import.meta.env.VITE_GITHUB_CLIENT_ID || "your_github_client_id";
+    const redirectUri = `${window.location.origin}/auth/callback`;
+    const scope = "read:user,user:email";
+    window.location.href = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scope}`;
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center p-4 font-sans text-[#e2e8f0] box-border selection:bg-purple-500 selection:text-white bg-[#111625]">
       <div className="w-full max-w-[920px] bg-[#111625] rounded-[20px] border border-slate-700/50 overflow-hidden shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] flex flex-col md:flex-row relative">
@@ -308,7 +315,11 @@ export const Login = () => {
               {isLogin ? "or continue with" : "or sign up with"}
             </span>
           </div>
-          <button className="w-full bg-[#171e30] border border-slate-700/40 text-white py-3 px-4 rounded-xl flex items-center justify-center gap-2.5 text-sm font-medium transition-colors duration-200 hover:bg-[#1e263d]">
+          <button 
+            type="button"
+            onClick={handleGithubLogin}
+            className="w-full bg-[#171e30] border border-slate-700/40 text-white py-3 px-4 rounded-xl flex items-center justify-center gap-2.5 text-sm font-medium transition-colors duration-200 hover:bg-[#1e263d]"
+          >
             <span>
               <FaGithub className="w-5 h-5 text-white fill-current" />
             </span>

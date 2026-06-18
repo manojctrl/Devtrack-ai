@@ -1,24 +1,71 @@
-import { IconAdjustmentsHorizontal } from '@tabler/icons-react';
+import { Sliders } from "lucide-react";
+import { useMemo } from "react";
 
-export const skillsData = [
-  { name: 'Java', score: 90, level: 'Advanced', label: 'Expert', grad: 'from-[#6366F1] to-[#818CF8]', text: 'text-[#818CF8]', badge: 'text-emerald-400 border-emerald-500/30 bg-emerald-500/10' },
-  { name: 'React', score: 80, level: 'Advanced', label: 'Proficient', grad: 'from-[#0EA5E9] to-[#38BDF8]', text: 'text-[#38BDF8]', badge: 'text-emerald-400 border-emerald-500/30 bg-emerald-500/10' },
-  { name: 'MySQL', score: 80, level: 'Advanced', label: 'Proficient', grad: 'from-[#10B981] to-[#34D399]', text: 'text-[#34D399]', badge: 'text-emerald-400 border-emerald-500/30 bg-emerald-500/10' },
-  { name: 'Node.js', score: 70, level: 'Intermediate', label: 'Growing', grad: 'from-[#F59E0B] to-[#FCD34D]', text: 'text-[#FCD34D]', badge: 'text-amber-400 border-amber-500/30 bg-amber-500/8' },
-  { name: 'Express.js', score: 60, level: 'Intermediate', label: 'Learning', grad: 'from-[#A855F7] to-[#C084FC]', text: 'text-[#C084FC]', badge: 'text-amber-400 border-amber-500/30 bg-amber-500/8' },
-  { name: 'Spring Boot', score: 55, level: 'Intermediate', label: 'Growing', grad: 'from-[#F43F5E] to-[#F87171]', text: 'text-[#F87171]', badge: 'text-amber-400 border-amber-500/30 bg-amber-500/8' },
+const GRADIENTS = [
+  "from-indigo-500 to-purple-500",
+  "from-emerald-500 to-teal-500",
+  "from-amber-500 to-orange-500",
+  "from-purple-500 to-pink-500",
 ];
 
-const SkillProficiency = () => {
+const SkillProficiency = ({ profile }) => {
+  const dynamicSkills = useMemo(() => {
+    const langs = profile?.languages || {};
+    const entries = Object.entries(langs);
+    if (entries.length === 0) {
+      // Fallback
+      return [
+        { name: "JavaScript", score: 85, level: "Expert", badge: "text-emerald-400 border-emerald-500/25 bg-emerald-500/10", text: "text-emerald-400", grad: GRADIENTS[0], label: "Core" },
+        { name: "TypeScript", score: 65, level: "Intermediate", badge: "text-indigo-400 border-indigo-500/25 bg-indigo-500/10", text: "text-indigo-400", grad: GRADIENTS[1], label: "Explore" },
+        { name: "Python", score: 45, level: "Exploring", badge: "text-purple-400 border-purple-500/25 bg-purple-500/10", text: "text-purple-400", grad: GRADIENTS[2], label: "Scripting" },
+      ];
+    }
+
+    const totalCount = entries.reduce((acc, [_, count]) => acc + count, 0);
+
+    return entries
+      .map(([name, count], index) => {
+        const score = Math.round((count / totalCount) * 100);
+        let level = "Exploring";
+        let badge = "text-purple-400 border-purple-500/25 bg-purple-500/10";
+        let text = "text-purple-400";
+        let label = "Beginner";
+
+        if (score >= 70) {
+          level = "Expert";
+          badge = "text-emerald-400 border-emerald-500/25 bg-emerald-500/10";
+          text = "text-emerald-450 text-emerald-400";
+          label = "Primary";
+        } else if (score >= 35) {
+          level = "Intermediate";
+          badge = "text-indigo-400 border-indigo-500/25 bg-indigo-500/10";
+          text = "text-indigo-400";
+          label = "Secondary";
+        }
+
+        return {
+          name,
+          score,
+          level,
+          badge,
+          text,
+          grad: GRADIENTS[index % GRADIENTS.length],
+          label,
+        };
+      })
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 4);
+  }, [profile]);
+
   return (
     <div className="bg-[#1a2035] rounded-xl p-6 border border-slate-800 flex flex-col h-[400px] shadow-md w-full justify-between">
       <div className="flex items-center gap-2 text-sm font-semibold tracking-wide uppercase text-gray-400">
-        <IconAdjustmentsHorizontal className="w-4 h-4 text-indigo-400" />
+        <Sliders className="w-4 h-4 text-indigo-400" />
         <span>Skill Proficiency</span>
       </div>
 
       <div className="flex-1 flex flex-col justify-center gap-3.5 mt-2">
-        {skillsData.map((skill, idx) => (
+        {dynamicSkills.map((skill, idx) => (
           <div key={idx} className="space-y-1.5">
             <div className="flex items-center justify-between text-xs">
               <div className="flex items-center gap-2">

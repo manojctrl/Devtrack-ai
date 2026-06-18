@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useContext } from 'react';
+import { AuthContext } from '../../context/AuthContext';
 import {
   IconInfoCircle,
   IconCode,
@@ -21,73 +22,72 @@ import {
   IconTrophy
 } from '@tabler/icons-react';
 
-const ProfileRight = () => {
-  const skills = [
-    { name: 'Java', icon: <IconCoffee />, styles: 'bg-amber-500/10 text-amber-400 border-amber-500/20' },
-    { name: 'React', icon: <IconBrandReact />, styles: 'bg-sky-500/10 text-sky-400 border-sky-500/20' },
-    { name: 'MySQL', icon: <IconDatabase />, styles: 'bg-blue-500/10 text-blue-400 border-blue-500/20' },
-    { name: 'Node.js', icon: <IconBrandNodejs />, styles: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' },
-    { name: 'Express', icon: <IconServer />, styles: 'bg-purple-500/10 text-purple-400 border-purple-500/20' },
-    { name: 'Spring Boot', icon: null, styles: 'bg-green-500/10 text-green-400 border-green-500/20' },
-    { name: 'Git', icon: <IconBrandGit />, styles: 'bg-orange-500/10 text-orange-400 border-orange-500/20' },
-    { name: 'GitHub', icon: <IconBrandGithub />, styles: 'bg-slate-800 text-slate-300 border-slate-700' },
-    { name: 'Tailwind CSS', icon: <IconWind />, styles: 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20' },
-    { name: 'REST APIs', icon: null, styles: 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20' },
-  ];
+const ProfileRight = ({ githubProfile, repos }) => {
+  const { user } = useContext(AuthContext);
 
-  const projects = [
-    {
-      name: 'DevTrack AI',
-      desc: 'Developer analytics & personal branding platform with GitHub integration',
-      stars: 48,
-      icon: <IconDeviceAnalytics />,
-      iconBg: 'bg-indigo-500/10 text-indigo-400',
-      tags: ['React', 'Express', 'MySQL'],
-    },
-    {
-      name: 'Travel Agency Dashboard',
-      desc: 'Full-stack travel booking web application with real-time availability',
-      stars: 32,
-      icon: <IconPlane />,
-      iconBg: 'bg-emerald-500/10 text-emerald-400',
-      tags: ['React', 'Node.js'],
-    },
-    {
-      name: 'Gym Management System',
-      desc: 'Desktop application for gym management with member tracking',
-      stars: 21,
-      icon: <IconBarbell />,
-      iconBg: 'bg-amber-500/10 text-amber-400',
-      tags: ['Java', 'Swing'],
-    },
-  ];
+  // Fallback language styling map
+  const getLanguageStyles = (lang) => {
+    const map = {
+      javascript: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
+      typescript: 'bg-sky-500/10 text-sky-450 text-sky-405 text-sky-400 border-sky-500/20',
+      react: 'bg-sky-550/10 text-sky-400 border-sky-550/20',
+      mysql: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
+      'node.js': 'bg-emerald-550/10 text-emerald-400 border-emerald-550/20',
+      node: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
+      express: 'bg-purple-500/10 text-purple-400 border-purple-500/20',
+      git: 'bg-orange-550/10 text-orange-400 border-orange-550/20',
+      html: 'bg-orange-500/10 text-orange-400 border-orange-500/20',
+      css: 'bg-pink-500/10 text-pink-400 border-pink-500/20',
+      python: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
+      java: 'bg-red-500/10 text-red-400 border-red-500/20',
+      go: 'bg-cyan-550/10 text-cyan-400 border-cyan-550/20',
+      cpp: 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20'
+    };
+    return map[lang.toLowerCase()] || 'bg-slate-800 text-slate-300 border-slate-700';
+  };
+
+  // 1. Bio / About Me
+  const aboutMe = user?.bio || githubProfile?.bio || "No biography provided yet. Add your bio in the settings page to showcase your background.";
+
+  // 2. Languages / Skills
+  const langObject = githubProfile?.languages || {};
+  const languages = Object.keys(langObject).sort((a, b) => langObject[b] - langObject[a]);
+
+  // 3. Featured Projects (GitHub Repos sorted by stars)
+  const featuredProjects = repos ? [...repos].sort((a, b) => b.stars - a.stars).slice(0, 3) : [];
+
+  // 4. Achievements Stats
+  const publicReposCount = githubProfile?.publicRepos || repos?.length || 0;
+  const totalStarsCount = githubProfile?.totalStars || repos?.reduce((acc, r) => acc + (r.stars || 0), 0) || 0;
+  const totalCommitsCount = githubProfile?.totalCommits || 0;
+  const techCount = languages.length || 0;
 
   const achievements = [
     { 
       icon: <IconTrophy />, 
       iconBg: 'bg-amber-500/10 text-amber-400',
-      val: '25', 
+      val: publicReposCount, 
       label: 'GitHub Repos', 
       color: 'text-gray-100' 
     },
     { 
       icon: <IconBrandGithub />, 
       iconBg: 'bg-red-500/10 text-red-400',
-      val: '1,600', 
+      val: totalCommitsCount > 0 ? totalCommitsCount.toLocaleString() : '—', 
       label: 'Contributions', 
       color: 'text-gray-100' 
     },
     { 
       icon: <IconStar />, 
       iconBg: 'bg-amber-500/10 text-amber-400',
-      val: '75', 
+      val: totalStarsCount, 
       label: 'Stars Earned', 
       color: 'text-gray-100' 
     },
     { 
       icon: <IconCode />, 
       iconBg: 'bg-emerald-500/10 text-emerald-400',
-      val: '10+', 
+      val: techCount > 0 ? `${techCount}` : '—', 
       label: 'Technologies', 
       color: 'text-gray-100' 
     },
@@ -100,29 +100,30 @@ const ProfileRight = () => {
         <h2 className="text-lg font-semibold text-gray-100 flex items-center gap-2 mb-4">
           <IconInfoCircle className="w-5 h-5 text-indigo-400" /> About Me
         </h2>
-        <p className="text-gray-400 leading-relaxed text-sm">
-          Passionate Full Stack Developer focused on building scalable web applications
-          using React, Node.js, Java, and MySQL. Currently pursuing BSc (Hons) Computing
-          at Itahari International College. I love building developer tools that make
-          workflows faster and portfolios more impressive.
+        <p className="text-gray-400 leading-relaxed text-sm whitespace-pre-line">
+          {aboutMe}
         </p>
       </section>
 
       <section className="bg-[#1a2035] rounded-xl p-6 shadow-md border border-slate-800">
         <h2 className="text-lg font-semibold text-gray-100 flex items-center gap-2 mb-4">
-          <IconCode className="w-5 h-5 text-indigo-400" /> Skills
+          <IconCode className="w-5 h-5 text-indigo-400" /> Primary Tech Stack
         </h2>
-        <div className="flex flex-wrap gap-2">
-          {skills.map((skill, index) => (
-            <span
-              key={index}
-              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border ${skill.styles}`}
-            >
-              {skill.icon && React.cloneElement(skill.icon, { className: 'w-3.5 h-3.5' })}
-              {skill.name}
-            </span>
-          ))}
-        </div>
+        {languages.length > 0 ? (
+          <div className="flex flex-wrap gap-2">
+            {languages.map((lang, index) => (
+              <span
+                key={index}
+                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border ${getLanguageStyles(lang)}`}
+              >
+                <IconCode className="w-3.5 h-3.5" />
+                {lang}
+              </span>
+            ))}
+          </div>
+        ) : (
+          <p className="text-xs text-gray-500">Connect and sync your GitHub profile to showcase your tech stack distribution.</p>
+        )}
       </section>
 
       <section className="bg-[#1a2035] rounded-xl p-6 shadow-md border border-slate-800">
@@ -148,42 +149,55 @@ const ProfileRight = () => {
           <h2 className="text-lg font-semibold text-gray-100 flex items-center gap-2">
             <IconFolderCode className="w-5 h-5 text-indigo-400" /> Featured Projects
           </h2>
-          <button className="text-xs font-medium text-indigo-400 hover:text-indigo-300 transition-colors bg-transparent border-none cursor-pointer">
-            View all →
-          </button>
+          {user?.githubUsername && (
+            <a 
+              href={`https://github.com/${user.githubUsername}?tab=repositories`} 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="text-xs font-medium text-indigo-400 hover:text-indigo-300 transition-colors cursor-pointer"
+            >
+              View all on GitHub →
+            </a>
+          )}
         </div>
 
-        <div className="flex flex-col gap-4">
-          {projects.map((project, index) => (
-            <div
-              key={index}
-              className="p-4 rounded-xl border border-slate-800 bg-[#121624]/40 hover:border-slate-700 transition-all"
-            >
-              <div className="flex justify-between items-center mb-2">
-                <div className="flex items-center gap-2.5">
-                  <div className={`flex items-center justify-center w-8 h-8 rounded-lg ${project.iconBg}`}>
-                    {React.cloneElement(project.icon, { className: 'w-4 h-4' })}
+        {featuredProjects.length > 0 ? (
+          <div className="flex flex-col gap-4">
+            {featuredProjects.map((project, index) => (
+              <a
+                key={index}
+                href={project.htmlUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-4 rounded-xl border border-slate-800 bg-[#121624]/40 hover:border-slate-700 transition-all block group"
+              >
+                <div className="flex justify-between items-center mb-2">
+                  <div className="flex items-center gap-2.5">
+                    <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-indigo-500/10 text-indigo-400 group-hover:bg-indigo-500/20 transition-all">
+                      <IconFolderCode className="w-4 h-4" />
+                    </div>
+                    <div className="text-sm font-semibold text-gray-200 group-hover:text-white transition-colors">{project.name}</div>
                   </div>
-                  <div className="text-sm font-semibold text-gray-200">{project.name}</div>
+                  <div className="flex items-center gap-1 text-xs font-medium text-gray-400">
+                    <IconStar className="w-3.5 h-3.5 text-amber-400 fill-amber-400" /> {project.stars}
+                  </div>
                 </div>
-                <div className="flex items-center gap-1 text-xs font-medium text-gray-400">
-                  <IconStar className="w-3.5 h-3.5 text-amber-400 fill-amber-400" /> {project.stars}
-                </div>
-              </div>
-              <div className="text-xs text-gray-400 mb-3">{project.desc}</div>
-              <div className="flex gap-1.5">
-                {project.tags.map((tag, tagIdx) => (
+                <div className="text-xs text-gray-400 mb-3 line-clamp-2">{project.description || "No repository description provided."}</div>
+                {project.language && (
                   <span
-                    key={tagIdx}
-                    className="text-[11px] px-2 py-0.5 rounded-md font-medium text-indigo-400 bg-indigo-500/5 border border-indigo-500/20"
+                    className={`text-[11px] px-2 py-0.5 rounded-md font-medium border ${getLanguageStyles(project.language)}`}
                   >
-                    {tag}
+                    {project.language}
                   </span>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
+                )}
+              </a>
+            ))}
+          </div>
+        ) : (
+          <div className="p-8 text-center rounded-xl border border-dashed border-slate-800 bg-[#121624]/20">
+            <p className="text-xs text-gray-500">Connect your GitHub username to feature your top repositories here.</p>
+          </div>
+        )}
       </section>
 
       <section className="bg-[#1a2035] rounded-xl p-6 shadow-md border border-slate-800">
@@ -211,4 +225,4 @@ const ProfileRight = () => {
   );
 };
 
-export default ProfileRight;
+export default ProfileRight;

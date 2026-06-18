@@ -1,66 +1,134 @@
 import { 
-  IconCategory, 
-  IconLayout, 
-  IconServer, 
-  IconDatabase, 
-  IconTools 
-} from '@tabler/icons-react';
+  Grid, 
+  Monitor, 
+  Server, 
+  Database, 
+  Wrench 
+} from "lucide-react";
+import { useMemo } from "react";
 
-const SkillCategoriesList = () => {
-  const categories = [
-    {
-      name: 'Frontend',
-      count: 5,
-      icon: <IconLayout className="w-5 h-5 text-sky-400" />,
-      iconBg: 'bg-sky-500/10',
-      tags: [
-        { name: 'React', color: 'text-indigo-400 border-indigo-500/25 bg-indigo-500/8' },
-        { name: 'Tailwind', color: 'text-sky-400 border-sky-500/25 bg-sky-500/8' },
-        { name: 'JavaScript', color: 'text-amber-400 border-amber-500/25 bg-amber-500/8' },
-        { name: 'HTML', color: 'text-rose-400 border-rose-500/25 bg-rose-500/8' },
-        { name: 'CSS', color: 'text-purple-400 border-purple-500/25 bg-purple-500/8' },
-      ]
-    },
-    {
-      name: 'Backend',
-      count: 4,
-      icon: <IconServer className="w-5 h-5 text-emerald-400" />,
-      iconBg: 'bg-emerald-500/10',
-      tags: [
-        { name: 'Node.js', color: 'text-lime-400 border-lime-500/25 bg-lime-500/8' },
-        { name: 'Express', color: 'text-purple-400 border-purple-500/25 bg-purple-500/8' },
-        { name: 'Java', color: 'text-indigo-400 border-indigo-500/25 bg-indigo-500/8' },
-        { name: 'REST API', color: 'text-amber-400 border-amber-500/25 bg-amber-500/8' },
-      ]
-    },
-    {
-      name: 'Database',
-      count: 2,
-      icon: <IconDatabase className="w-5 h-5 text-amber-400" />,
-      iconBg: 'bg-amber-500/10',
-      tags: [
-        { name: 'MySQL', color: 'text-emerald-400 border-emerald-500/25 bg-emerald-500/8' },
-        { name: 'MongoDB', color: 'text-lime-400 border-lime-500/25 bg-lime-500/8' },
-      ]
-    },
-    {
-      name: 'Tools',
-      count: 4,
-      icon: <IconTools className="w-5 h-5 text-purple-400" />,
-      iconBg: 'bg-purple-500/10',
-      tags: [
-        { name: 'Git', color: 'text-rose-400 border-rose-500/25 bg-rose-500/8' },
-        { name: 'GitHub', color: 'text-slate-300 border-slate-500/20 bg-white/5' },
-        { name: 'VS Code', color: 'text-sky-400 border-sky-500/25 bg-sky-500/8' },
-        { name: 'Postman', color: 'text-amber-400 border-amber-500/25 bg-amber-500/8' },
-      ]
+const SkillCategoriesList = ({ profile }) => {
+  const categories = useMemo(() => {
+    const langs = Object.keys(profile?.languages || {});
+    
+    // Default categories if no profile languages loaded
+    if (langs.length === 0) {
+      return [
+        {
+          name: "Frontend",
+          count: 4,
+          icon: <Monitor className="w-5 h-5 text-sky-400" />,
+          iconBg: "bg-sky-500/10",
+          tags: [
+            { name: "React", color: "text-indigo-400 border-indigo-500/25 bg-indigo-500/8" },
+            { name: "JavaScript", color: "text-amber-400 border-amber-500/25 bg-amber-500/8" },
+            { name: "HTML", color: "text-rose-400 border-rose-500/25 bg-rose-500/8" },
+            { name: "CSS", color: "text-purple-400 border-purple-500/25 bg-purple-500/8" },
+          ]
+        },
+        {
+          name: "Backend",
+          count: 3,
+          icon: <Server className="w-5 h-5 text-emerald-400" />,
+          iconBg: "bg-emerald-500/10",
+          tags: [
+            { name: "Node.js", color: "text-lime-400 border-lime-500/25 bg-lime-500/8" },
+            { name: "Express", color: "text-purple-400 border-purple-500/25 bg-purple-500/8" },
+            { name: "Python", color: "text-amber-400 border-amber-500/25 bg-amber-500/8" },
+          ]
+        },
+        {
+          name: "Database",
+          count: 1,
+          icon: <Database className="w-5 h-5 text-amber-400" />,
+          iconBg: "bg-amber-500/10",
+          tags: [
+            { name: "SQL", color: "text-emerald-400 border-emerald-500/25 bg-emerald-500/8" }
+          ]
+        },
+        {
+          name: "Tools",
+          count: 3,
+          icon: <Wrench className="w-5 h-5 text-purple-400" />,
+          iconBg: "bg-purple-500/10",
+          tags: [
+            { name: "Git", color: "text-rose-400 border-rose-500/25 bg-rose-500/8" },
+            { name: "GitHub", color: "text-slate-350 border-slate-500/20 bg-white/5" },
+            { name: "VS Code", color: "text-sky-400 border-sky-500/25 bg-sky-500/8" }
+          ]
+        }
+      ];
     }
-  ];
+
+    const frontendLangs = [];
+    const backendLangs = [];
+    const dbLangs = [];
+    const toolLangs = ["Git", "GitHub", "VS Code"]; // static additions
+
+    langs.forEach((lang) => {
+      const lower = lang.toLowerCase();
+      if (["javascript", "typescript", "html", "css", "vue", "svelte", "angular", "sass"].includes(lower)) {
+        frontendLangs.push(lang);
+      } else if (["mysql", "postgresql", "sqlite", "mongodb", "redis", "oracle", "sql"].includes(lower)) {
+        dbLangs.push(lang);
+      } else {
+        backendLangs.push(lang);
+      }
+    });
+
+    const categoriesList = [];
+
+    categoriesList.push({
+      name: "Frontend",
+      count: frontendLangs.length || 1,
+      icon: <Monitor className="w-5 h-5 text-sky-400" />,
+      iconBg: "bg-sky-500/10",
+      tags: (frontendLangs.length > 0 ? frontendLangs : ["HTML/CSS"]).map((name) => ({
+        name,
+        color: "text-sky-400 border-sky-500/25 bg-sky-500/8"
+      }))
+    });
+
+    categoriesList.push({
+      name: "Backend",
+      count: backendLangs.length || 1,
+      icon: <Server className="w-5 h-5 text-emerald-400" />,
+      iconBg: "bg-emerald-500/10",
+      tags: (backendLangs.length > 0 ? backendLangs : ["Node.js"]).map((name) => ({
+        name,
+        color: "text-emerald-400 border-emerald-500/25 bg-emerald-500/8"
+      }))
+    });
+
+    categoriesList.push({
+      name: "Database",
+      count: dbLangs.length || 1,
+      icon: <Database className="w-5 h-5 text-amber-400" />,
+      iconBg: "bg-amber-500/10",
+      tags: (dbLangs.length > 0 ? dbLangs : ["SQLite"]).map((name) => ({
+        name,
+        color: "text-amber-400 border-amber-500/25 bg-amber-500/8"
+      }))
+    });
+
+    categoriesList.push({
+      name: "Tools",
+      count: toolLangs.length,
+      icon: <Wrench className="w-5 h-5 text-purple-400" />,
+      iconBg: "bg-purple-500/10",
+      tags: toolLangs.map((name) => ({
+        name,
+        color: "text-purple-400 border-purple-500/25 bg-purple-500/8"
+      }))
+    });
+
+    return categoriesList;
+  }, [profile]);
 
   return (
-    <div className="bg-[#1a2035] rounded-xl p-6 border border-slate-800 flex flex-col gap-5 shadow-md w-full">
+    <div className="bg-[#1a2035] rounded-xl p-6 border border-slate-800 flex flex-col gap-5 shadow-md w-full mt-6">
       <div className="flex items-center gap-2 text-sm font-semibold tracking-wide uppercase text-gray-400">
-        <IconCategory className="w-4 h-4 text-indigo-400" />
+        <Grid className="w-4 h-4 text-indigo-400" />
         <span>Skill Categories</span>
       </div>
 

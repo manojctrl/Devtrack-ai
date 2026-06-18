@@ -1,4 +1,3 @@
-import React from "react";
 import { Moon, Sun, Check } from "lucide-react";
 
 const AppearanceSettings = ({

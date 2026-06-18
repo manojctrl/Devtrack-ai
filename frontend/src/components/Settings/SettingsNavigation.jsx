@@ -1,4 +1,3 @@
-import React from "react";
 import { User, Shield, Palette, Bell, AlertTriangle } from "lucide-react";
 import { FaGithub } from "react-icons/fa";
 

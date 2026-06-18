@@ -1,10 +1,16 @@
-import React from "react";
-import { useState } from "react";
-import { useEffect } from "react";
-import { createContext } from "react";
-import axios from "axios";
+import { useState, useEffect, createContext, useContext } from "react";
+import api from "../services/api";
 
 export const AuthContext = createContext();
+
+// Custom hook for consuming auth context
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+  return context;
+};
 
 const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
@@ -13,8 +19,16 @@ const AuthProvider = ({ children }) => {
   const logout = () => {
     localStorage.removeItem("token");
     setUser(null);
-    window.location.href = '/auth'
-  }
+    window.location.href = "/auth";
+  };
+
+  // Helper to update user state and persist to localStorage
+  const updateUser = (updatedFields) => {
+    setUser((prev) => {
+      const merged = { ...prev, ...updatedFields };
+      return merged;
+    });
+  };
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -26,11 +40,7 @@ const AuthProvider = ({ children }) => {
           return;
         }
 
-        const response = await axios.get("http://localhost:5000/api/user/me", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const response = await api.get("/user/me");
 
         setUser(response.data);
       } catch (error) {
@@ -45,7 +55,7 @@ const AuthProvider = ({ children }) => {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, loading, setUser, logout }}>
+    <AuthContext.Provider value={{ user, loading, setUser, updateUser, logout }}>
       {children}
     </AuthContext.Provider>
   );

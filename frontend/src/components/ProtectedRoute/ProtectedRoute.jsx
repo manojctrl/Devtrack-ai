@@ -1,14 +1,24 @@
-import React from 'react'
-import { Navigate, Outlet } from 'react-router-dom'
+import { useContext } from "react";
+import { Navigate, Outlet } from "react-router-dom";
+import { AuthContext } from "../../context/AuthContext";
 
 const ProtectedRoute = () => {
-  const token = localStorage.getItem("token")
+  const { loading, user } = useContext(AuthContext);
+  const token = localStorage.getItem("token");
 
-  if (!token) {
-    return <Navigate to="/auth" replace />
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-slate-50 dark:bg-[#111625] flex items-center justify-center text-slate-700 dark:text-slate-200">
+        Loading...
+      </div>
+    );
   }
 
-  return <Outlet />
-}
+  if (!token || !user) {
+    return <Navigate to="/auth" replace />;
+  }
 
-export default ProtectedRoute
+  return <Outlet />;
+};
+
+export default ProtectedRoute;

@@ -3,6 +3,7 @@ import { NavLink } from "react-router-dom";
 import { House, User, Brain, FileText, Settings, Menu } from "lucide-react";
 import { FaGithub } from "react-icons/fa";
 import { useTheme } from "../../context/ThemeContext";
+import logo from "../../assets/logo.png";
 
 const Sidebar = () => {
   const [open, setOpen] = useState(false);
@@ -33,7 +34,7 @@ const Sidebar = () => {
         <div className="flex items-center gap-3 px-6 h-16 border-b border-slate-200 dark:border-slate-800">
           <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-md flex items-center justify-center overflow-hidden">
             <img
-              src="src/assets/logo.png"
+              src={logo}
               alt="DevTrack Logo"
               className="w-full h-full object-cover"
             />

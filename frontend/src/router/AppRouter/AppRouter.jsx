@@ -1,12 +1,14 @@
 import { Route, Routes } from "react-router-dom"
 import Landing from "../../Pages/Landing/Landing"
 import { Login } from "../../Pages/Login/Login"
+import AuthCallback from "../../Pages/Login/AuthCallback"
 import Dashboard from "../../Pages/dashboard/Dashboard"
 import Profile from "../../Pages/dashboard/Profile"
 import GitHubAnalytics from "../../Pages/dashboard/GitHubAnalytics"
 import Skills from "../../Pages/dashboard/Skills"
 import Resume from "../../Pages/dashboard/Resume"
 import Settings from "../../Pages/dashboard/Settings"
+import PublicProfile from "../../Pages/PublicProfile/PublicProfile"
 import ProtectedRoute from "../../components/ProtectedRoute/ProtectedRoute"
 
 const AppRouter = () => {
@@ -14,6 +16,8 @@ const AppRouter = () => {
     <Routes>
         <Route path="/" element={<Landing />} />
         <Route path="/auth" element={<Login />}/>
+        <Route path="/auth/callback" element={<AuthCallback />} />
+        <Route path="/developer/:username" element={<PublicProfile />} />
 
         <Route element= {<ProtectedRoute/>}>
         <Route path="/dashboard" element={<Dashboard/>}/>
@@ -27,4 +31,4 @@ const AppRouter = () => {
   )
 }
 
-export default AppRouter
+export default AppRouter

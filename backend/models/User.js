@@ -29,6 +29,31 @@ const User = sequelize.define("User", {
     allowNull: true,
   },
 
+  bio: {
+    type: DataTypes.TEXT,
+    allowNull: true,
+  },
+
+  location: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+
+  linkedin: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+
+  website: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+
+  profilePicture: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+
   password: {
     type: DataTypes.STRING,
     allowNull: false,
