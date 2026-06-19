@@ -3,6 +3,7 @@ import { Mail, Lock, EyeOff, Eye, ArrowLeft } from "lucide-react";
 import { useState } from "react";
 import { FaGithub } from "react-icons/fa";
 import axios from "axios"; 
+import { useAuth } from "../../context/AuthContext";
 
 import {
   BarChart3,
@@ -16,6 +17,7 @@ import {
 export const Login = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
+  const { setUser } = useAuth();
   const [loginData, setLoginData] = useState({
     email: "",
     password: "",
@@ -44,6 +46,7 @@ export const Login = () => {
         if (response.data) {
           alert("Login successful!");
           localStorage.setItem("token", response.data.token); 
+          setUser(response.data.user);
           navigate("/dashboard"); 
         }
       } else {
