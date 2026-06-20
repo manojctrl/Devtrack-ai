@@ -9,7 +9,6 @@ const getPublicDeveloperProfile = async (req, res) => {
       return res.status(400).json({ message: "GitHub username parameter is required." });
     }
 
-    // Find User by githubUsername (case-insensitive search helper)
     const user = await User.findOne({
       where: {
         githubUsername: username.trim(),
@@ -21,7 +20,6 @@ const getPublicDeveloperProfile = async (req, res) => {
       return res.status(404).json({ message: `Developer with GitHub username '${username}' not found on DevTrack AI.` });
     }
 
-    // Fetch related GitHub profile and repositories
     const githubProfile = await GithubProfile.findOne({
       where: { userId: user.id },
     });
