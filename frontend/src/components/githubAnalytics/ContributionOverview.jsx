@@ -4,34 +4,79 @@ import { useMemo } from "react";
 const ContributionOverview = ({ profile }) => {
   const { totalContributions, currentStreak, longestStreak } = useMemo(() => {
     const heatmap = profile?.contributionHeatmap || {};
-    const today = new Date();
     
     let totalConts = 0;
     Object.values(heatmap).forEach((count) => {
       totalConts += count;
     });
 
-    // Calculate Streak
-    let streak = 0;
-    const checkDate = new Date(today);
-    while (true) {
-      const dateStr = checkDate.toISOString().split("T")[0];
-      if (heatmap[dateStr] && heatmap[dateStr] > 0) {
-        streak++;
-        checkDate.setDate(checkDate.getDate() - 1);
-      } else {
-        if (checkDate.toDateString() === today.toDateString()) {
-          checkDate.setDate(checkDate.getDate() - 1);
-          continue;
+    const getUTCDateString = (date) => {
+      const y = date.getUTCFullYear();
+      const m = String(date.getUTCMonth() + 1).padStart(2, "0");
+      const d = String(date.getUTCDate()).padStart(2, "0");
+      return `${y}-${m}-${d}`;
+    };
+
+    // Calculate Current Streak in UTC
+    let currentStrk = 0;
+    const checkDate = new Date();
+    checkDate.setUTCHours(12, 0, 0, 0);
+
+    const todayStr = getUTCDateString(new Date());
+    const todayHasContrib = heatmap[todayStr] && heatmap[todayStr] > 0;
+
+    let canStartStreak = todayHasContrib;
+    if (!canStartStreak) {
+      checkDate.setUTCDate(checkDate.getUTCDate() - 1);
+      const yesterdayStr = getUTCDateString(checkDate);
+      if (heatmap[yesterdayStr] && heatmap[yesterdayStr] > 0) {
+        canStartStreak = true;
+      }
+    }
+
+    if (canStartStreak) {
+      while (true) {
+        const dateStr = getUTCDateString(checkDate);
+        if (heatmap[dateStr] && heatmap[dateStr] > 0) {
+          currentStrk++;
+          checkDate.setUTCDate(checkDate.getUTCDate() - 1);
+        } else {
+          break;
         }
-        break;
+      }
+    }
+
+    // Calculate Actual Longest Streak
+    let maxStreak = 0;
+    const contributionDates = Object.keys(heatmap)
+      .filter((dateStr) => heatmap[dateStr] > 0)
+      .sort();
+      
+    if (contributionDates.length > 0) {
+      maxStreak = 1;
+      let tempStreak = 1;
+      for (let i = 1; i < contributionDates.length; i++) {
+        const prevDate = new Date(contributionDates[i - 1]);
+        const currDate = new Date(contributionDates[i]);
+        
+        const diffTime = Math.abs(currDate - prevDate);
+        const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+        
+        if (diffDays === 1) {
+          tempStreak++;
+          if (tempStreak > maxStreak) {
+            maxStreak = tempStreak;
+          }
+        } else if (diffDays > 1) {
+          tempStreak = 1;
+        }
       }
     }
 
     return {
       totalContributions: totalConts,
-      currentStreak: streak,
-      longestStreak: streak > 10 ? streak : 12, // fallback / estimate
+      currentStreak: currentStrk,
+      longestStreak: maxStreak,
     };
   }, [profile]);
 

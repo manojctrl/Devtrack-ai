@@ -109,21 +109,39 @@ export default function ContributionHeatmap({ profile }) {
       tempGrid.push(week);
     }
 
-    // Calculate Streak based on full history relative to today
+    const getUTCDateString = (date) => {
+      const y = date.getUTCFullYear();
+      const m = String(date.getUTCMonth() + 1).padStart(2, "0");
+      const d = String(date.getUTCDate()).padStart(2, "0");
+      return `${y}-${m}-${d}`;
+    };
+
+    // Calculate Streak based on full history relative to today in UTC
     let streak = 0;
-    const today = new Date();
-    const checkDate = new Date(today);
-    while (true) {
-      const dateStr = checkDate.toISOString().split("T")[0];
-      if (heatmap[dateStr] && heatmap[dateStr] > 0) {
-        streak++;
-        checkDate.setDate(checkDate.getDate() - 1);
-      } else {
-        if (checkDate.toDateString() === today.toDateString()) {
-          checkDate.setDate(checkDate.getDate() - 1);
-          continue;
+    const checkDate = new Date();
+    checkDate.setUTCHours(12, 0, 0, 0);
+
+    const todayStr = getUTCDateString(new Date());
+    const todayHasContrib = heatmap[todayStr] && heatmap[todayStr] > 0;
+
+    let canStartStreak = todayHasContrib;
+    if (!canStartStreak) {
+      checkDate.setUTCDate(checkDate.getUTCDate() - 1);
+      const yesterdayStr = getUTCDateString(checkDate);
+      if (heatmap[yesterdayStr] && heatmap[yesterdayStr] > 0) {
+        canStartStreak = true;
+      }
+    }
+
+    if (canStartStreak) {
+      while (true) {
+        const dateStr = getUTCDateString(checkDate);
+        if (heatmap[dateStr] && heatmap[dateStr] > 0) {
+          streak++;
+          checkDate.setUTCDate(checkDate.getUTCDate() - 1);
+        } else {
+          break;
         }
-        break;
       }
     }
 
