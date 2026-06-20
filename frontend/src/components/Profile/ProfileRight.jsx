@@ -25,12 +25,17 @@ import {
 const ProfileRight = ({ githubProfile, repos }) => {
   const { user } = useContext(AuthContext);
 
+  const isManoj = !!(user && (
+    (user.firstName && user.firstName.toLowerCase().includes("manoj")) ||
+    (user.lastName && user.lastName.toLowerCase().includes("katuwal"))
+  ));
+
   // Fallback language styling map
   const getLanguageStyles = (lang) => {
     const map = {
       javascript: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
       typescript: 'bg-sky-500/10 text-sky-450 text-sky-405 text-sky-400 border-sky-500/20',
-      react: 'bg-sky-550/10 text-sky-400 border-sky-550/20',
+      react: 'bg-sky-550/10 text-sky-450 text-sky-405 text-sky-400 border-sky-550/20',
       mysql: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
       'node.js': 'bg-emerald-550/10 text-emerald-400 border-emerald-550/20',
       node: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
@@ -38,7 +43,7 @@ const ProfileRight = ({ githubProfile, repos }) => {
       git: 'bg-orange-550/10 text-orange-400 border-orange-550/20',
       html: 'bg-orange-500/10 text-orange-400 border-orange-500/20',
       css: 'bg-pink-500/10 text-pink-400 border-pink-500/20',
-      python: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
+      python: 'bg-emerald-500/10 text-emerald-400 border-emerald-550/20',
       java: 'bg-red-500/10 text-red-400 border-red-500/20',
       go: 'bg-cyan-550/10 text-cyan-400 border-cyan-550/20',
       cpp: 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20'
@@ -122,7 +127,7 @@ const ProfileRight = ({ githubProfile, repos }) => {
             ))}
           </div>
         ) : (
-          <p className="text-xs text-gray-500">Connect and sync your GitHub profile to showcase your tech stack distribution.</p>
+          <p className="text-xs text-gray-550">Connect and sync your GitHub profile to showcase your tech stack distribution.</p>
         )}
       </section>
 
@@ -135,10 +140,14 @@ const ProfileRight = ({ githubProfile, repos }) => {
             <IconBuildingCommunity className="w-5 h-5" />
           </div>
           <div>
-            <div className="text-sm font-semibold text-gray-200">Itahari International College</div>
-            <div className="text-xs text-gray-400 mt-0.5">BSc (Hons) Computing</div>
+            <div className="text-sm font-semibold text-gray-200">
+              {isManoj ? "Itahari International College" : "University / Institution"}
+            </div>
+            <div className="text-xs text-gray-400 mt-0.5">
+              {isManoj ? "BSc (Hons) Computing" : "Degree / Course of Study"}
+            </div>
             <div className="text-xs text-gray-500 mt-1 flex items-center gap-1">
-              <IconCalendar className="w-3.5 h-3.5" /> 2023 – Present
+              <IconCalendar className="w-3.5 h-3.5" /> {isManoj ? "2023 – Present" : "Year – Present"}
             </div>
           </div>
         </div>

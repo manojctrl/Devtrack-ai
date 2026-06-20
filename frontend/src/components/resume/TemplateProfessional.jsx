@@ -1,17 +1,20 @@
 import { useMemo } from "react";
 
 export default function TemplateProfessional({ user, githubProfile, repos }) {
-  const name = user ? `${user.firstName} ${user.lastName}` : "MANOJ KATUWAL";
-  const email = user?.email || "katwalmanoj67@gmail.com";
-  const phone = user?.phone || "+977-9804064003";
-  const location = user?.location || "Dharan, Nepal";
-  const github = user?.githubUsername || "katwalmanoj67";
-  const website = user?.website || "https://manojkatuwal.com.np";
+  const isManoj = !!(user && (
+    (user.firstName && user.firstName.toLowerCase().includes("manoj")) ||
+    (user.lastName && user.lastName.toLowerCase().includes("katuwal"))
+  ));
 
-  const isManoj = name.toLowerCase().includes("manoj") || name.toLowerCase().includes("katuwal") || !user;
+  const name = user ? `${user.firstName} ${user.lastName}` : (isManoj ? "MANOJ KATUWAL" : "Developer Name");
+  const email = user?.email || (isManoj ? "katwalmanoj67@gmail.com" : "developer@example.com");
+  const phone = user?.phone || (isManoj ? "+977-9804064003" : "+1-123-456-7890");
+  const location = user?.location || (isManoj ? "Dharan, Nepal" : "City, Country");
+  const github = user?.githubUsername || (isManoj ? "katwalmanoj67" : "github-username");
+  const website = user?.website || (isManoj ? "https://manojkatuwal.com.np" : "https://yourportfolio.dev");
 
   const projectList = useMemo(() => {
-    if (repos && repos.length > 0 && !isManoj) {
+    if (repos && repos.length > 0) {
       return repos.slice(0, 3).map((r) => ({
         name: r.name,
         date: r.created_at ? new Date(r.created_at).getFullYear().toString() : "2025",
@@ -23,7 +26,7 @@ export default function TemplateProfessional({ user, githubProfile, repos }) {
         ],
       }));
     }
-    return [
+    return isManoj ? [
       {
         name: "Travel Agency Admin Dashboard",
         date: "2025",
@@ -44,14 +47,35 @@ export default function TemplateProfessional({ user, githubProfile, repos }) {
           "Implemented CRUD operations with MongoDB and working on authentication.",
         ],
       },
+    ] : [
+      {
+        name: "DevTrack AI Developer Analytics",
+        date: "2025",
+        tech: "React.js, Node.js, Express, MySQL",
+        bullets: [
+          "Developed a full-stack developer analytics platform with GitHub integration.",
+          "Built interactive charts and visualizations for repository activity.",
+          "Designed clean and responsive user interface components.",
+        ],
+      },
+      {
+        name: "Full-Stack Web Application",
+        date: "2026",
+        tech: "React.js, Express.js, MongoDB",
+        bullets: [
+          "Built a responsive frontend and implemented RESTful APIs.",
+          "Implemented secure authentication and CRUD database operations.",
+          "Optimized application load times and performance.",
+        ],
+      },
     ];
   }, [repos, isManoj]);
 
   const primaryLanguages = useMemo(() => {
-    if (githubProfile?.languages && Object.keys(githubProfile.languages).length > 0 && !isManoj) {
+    if (githubProfile?.languages && Object.keys(githubProfile.languages).length > 0) {
       return Object.keys(githubProfile.languages).slice(0, 4).join(", ");
     }
-    return "Java, Python, JavaScript";
+    return isManoj ? "Java, Python, JavaScript" : "JavaScript, HTML/CSS, Node.js";
   }, [githubProfile, isManoj]);
 
   return (
@@ -77,7 +101,10 @@ export default function TemplateProfessional({ user, githubProfile, repos }) {
           CAREER OBJECTIVE
         </h2>
         <p className="text-[13px] text-slate-700 text-justify leading-relaxed">
-          {user?.bio || "I am Manoj Katuwal, a Computer Science student at Itahari International College. I am passionate about software development and enjoy working on projects like Gym Management Systems and Inventory Systems. I am currently developing my skills in Java, Python, and React, with a goal of becoming a full-stack developer"}
+          {user?.bio || (isManoj 
+            ? "I am Manoj Katuwal, a Computer Science student at Itahari International College. I am passionate about software development and enjoy working on projects like Gym Management Systems and Inventory Systems. I am currently developing my skills in Java, Python, and React, with a goal of becoming a full-stack developer"
+            : "I am a passionate software developer dedicated to building efficient, scalable, and user-friendly web applications. Experienced in modern frontend and backend technologies, with a strong focus on clean code and continuous learning."
+          )}
         </p>
       </div>
 
@@ -87,20 +114,41 @@ export default function TemplateProfessional({ user, githubProfile, repos }) {
           EDUCATION
         </h2>
         <div className="space-y-3">
-          <div className="flex justify-between items-start text-[13px]">
-            <div>
-              <div className="font-bold text-slate-800">BSc (Hons) Computing</div>
-              <div className="text-slate-600 italic">Itahari International College | Itahari, Nepal</div>
-            </div>
-            <div className="text-slate-600 italic font-medium">2023 – Present</div>
-          </div>
-          <div className="flex justify-between items-start text-[13px]">
-            <div>
-              <div className="font-bold text-slate-800">Higher Secondary Education (Science)</div>
-              <div className="text-slate-650 italic">Aims Academy | Dharan, Nepal</div>
-            </div>
-            <div className="text-slate-600 italic font-medium">2020 – 2022</div>
-          </div>
+          {isManoj ? (
+            <>
+              <div className="flex justify-between items-start text-[13px]">
+                <div>
+                  <div className="font-bold text-slate-800">BSc (Hons) Computing</div>
+                  <div className="text-slate-650 italic">Itahari International College | Itahari, Nepal</div>
+                </div>
+                <div className="text-slate-600 italic font-medium">2023 – Present</div>
+              </div>
+              <div className="flex justify-between items-start text-[13px]">
+                <div>
+                  <div className="font-bold text-slate-800">Higher Secondary Education (Science)</div>
+                  <div className="text-slate-650 italic">Aims Academy | Dharan, Nepal</div>
+                </div>
+                <div className="text-slate-600 italic font-medium">2020 – 2022</div>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="flex justify-between items-start text-[13px]">
+                <div>
+                  <div className="font-bold text-slate-800">Bachelor of Science in Computer Science</div>
+                  <div className="text-slate-600 italic">Your University Name | City, Country</div>
+                </div>
+                <div className="text-slate-600 italic font-medium">2023 – Present</div>
+              </div>
+              <div className="flex justify-between items-start text-[13px]">
+                <div>
+                  <div className="font-bold text-slate-800">High School Diploma</div>
+                  <div className="text-slate-600 italic">Your High School | City, Country</div>
+                </div>
+                <div className="text-slate-600 italic font-medium">2020 – 2022</div>
+              </div>
+            </>
+          )}
         </div>
       </div>
 
@@ -170,13 +218,25 @@ export default function TemplateProfessional({ user, githubProfile, repos }) {
           REFERENCES
         </h2>
         <div className="text-[13px]">
-          <div className="font-bold text-slate-800">Nishes Bishwas</div>
-          <div className="text-slate-700">
-            Lecturer, Itahari International College |{" "}
-            <a href="mailto:nishwas.bishwas@iic.edu.np" className="underline text-blue-600 hover:text-blue-800">
-              nishwas.bishwas@iic.edu.np
-            </a>
-          </div>
+          {isManoj ? (
+            <>
+              <div className="font-bold text-slate-800">Nishes Bishwas</div>
+              <div className="text-slate-700">
+                Lecturer, Itahari International College |{" "}
+                <a href="mailto:nishwas.bishwas@iic.edu.np" className="underline text-blue-600 hover:text-blue-800">
+                  nishwas.bishwas@iic.edu.np
+                </a>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="font-bold text-slate-800">Professional Reference</div>
+              <div className="text-slate-700">
+                Position, Company / Institution |{" "}
+                <span className="text-slate-600">reference@example.com</span>
+              </div>
+            </>
+          )}
         </div>
       </div>
     </div>
