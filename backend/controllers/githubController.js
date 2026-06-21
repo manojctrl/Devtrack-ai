@@ -1,4 +1,5 @@
 const { GithubProfile, GithubRepo, User, sequelize } = require("../models");
+const { getIO } = require("../config/socket");
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 const REPOS_PER_PAGE = 100;
@@ -180,6 +181,15 @@ const syncGithubData = async (req, res) => {
       return res.status(400).json({ message: "Please connect your GitHub username in Settings first." });
     }
 
+    const io = getIO();
+    const emitSyncProgress = (status, message, data = null) => {
+      if (io) {
+        io.to(`user_${user.id}`).emit("sync:progress", { type: "github", status, message, data });
+      }
+    };
+
+    emitSyncProgress("started", "Connecting to GitHub...");
+
     const username = user.githubUsername.trim();
     const headers = buildGithubHeaders();
 
@@ -189,30 +199,38 @@ const syncGithubData = async (req, res) => {
 
     try {
       // 1. Fetch Profile
+      emitSyncProgress("fetching_profile", `Fetching GitHub profile for '${username}'...`);
       const profileResult = await githubFetch(`https://api.github.com/users/${username}`, headers);
 
       if (profileResult.notFound) {
+        emitSyncProgress("failed", `GitHub user '${username}' not found.`);
         return res.status(404).json({ message: `GitHub user '${username}' not found.` });
       }
 
       if (profileResult.rateLimited) {
         isMocked = true;
+        emitSyncProgress("rate_limited", "GitHub API rate limit hit. Generating fallback mock data...");
       } else {
         const profileData = profileResult.data;
+        emitSyncProgress("profile_fetched", "Profile data fetched successfully.");
 
         // 2. Fetch Repositories
+        emitSyncProgress("fetching_repos", "Fetching repositories...");
         const reposResult = await githubFetch(
           `https://api.github.com/users/${username}/repos?per_page=${REPOS_PER_PAGE}&sort=updated`,
           headers
         );
         const reposData = reposResult.data || [];
+        emitSyncProgress("repos_fetched", "Repositories data fetched successfully.");
 
         // 3. Fetch Events for Heatmap + Activity
+        emitSyncProgress("fetching_events", "Fetching recent activity & contributions...");
         const eventsResult = await githubFetch(
           `https://api.github.com/users/${username}/events?per_page=${EVENTS_PER_PAGE}`,
           headers
         );
         const eventsData = eventsResult.data || [];
+        emitSyncProgress("events_fetched", "Activity data fetched successfully.");
 
         // Process data
         const totalStars = reposData.reduce((acc, repo) => acc + (repo.stargazers_count || 0), 0);
@@ -253,6 +271,7 @@ const syncGithubData = async (req, res) => {
     } catch (apiError) {
       console.error("GitHub API communication error:", apiError.message);
       isMocked = true;
+      emitSyncProgress("rate_limited", "GitHub communication error. Generating fallback mock data...");
     }
 
     if (isMocked) {
@@ -261,6 +280,7 @@ const syncGithubData = async (req, res) => {
       finalRepos = mock.repos;
     }
 
+    emitSyncProgress("saving", "Saving profile and repository details to database...");
     let [githubProfile] = await GithubProfile.findOrCreate({
       where: { userId: user.id },
       defaults: { userId: user.id },
@@ -282,6 +302,8 @@ const syncGithubData = async (req, res) => {
     if (!user.location && finalProfile.location) userUpdates.location = finalProfile.location;
     if (Object.keys(userUpdates).length > 0) await user.update(userUpdates);
 
+    emitSyncProgress("completed", isMocked ? "GitHub Sync successful (using offline fallback mode)" : "GitHub Sync successful", { profile: githubProfile, repos: finalRepos });
+
     return res.status(200).json({
       message: isMocked
         ? "GitHub Sync successful (using offline fallback mode)"
@@ -293,6 +315,9 @@ const syncGithubData = async (req, res) => {
     });
   } catch (error) {
     console.error("Error syncing GitHub data:", error);
+    if (io) {
+      io.to(`user_${req.user.id}`).emit("sync:progress", { type: "github", status: "failed", message: error.message || "Server error during GitHub synchronization." });
+    }
     return res.status(500).json({
       message: "Server error during GitHub synchronization.",
       error: error.message,

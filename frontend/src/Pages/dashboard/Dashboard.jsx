@@ -11,10 +11,12 @@ import LearningRoadMapAndRecentActivity from "../../components/dashboard/Learnin
 import DeveloperLevelAndQuickActions from "../../components/dashboard/DeveloperLevelAndQuickActions";
 import API from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
+import { useSocket } from "../../context/SocketContext";
 import { RefreshCw, Wifi, WifiOff } from "lucide-react";
 
 const Dashboard = () => {
   const { user } = useAuth();
+  const socket = useSocket();
   const [githubData, setGithubData] = useState(null);
   const [aiRecommendations, setAiRecommendations] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -23,22 +25,52 @@ const Dashboard = () => {
   const [error, setError] = useState("");
   const hasAutoSynced = useRef(false);
 
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleSyncProgress = (data) => {
+      setSyncing(true);
+      setError("");
+      if (data.message) {
+        setSyncMessage(data.message);
+      }
+
+      if (data.status === "completed" && data.type === "github") {
+        if (data.data) {
+          setGithubData(data.data);
+        }
+      } else if (data.status === "ai_completed" && data.type === "ai") {
+        if (data.data?.recommendations) {
+          setAiRecommendations(data.data.recommendations);
+        }
+        setSyncMessage("✓ Profile & career insights synced!");
+        setTimeout(() => {
+          setSyncMessage("");
+          setSyncing(false);
+        }, 3000);
+      } else if (data.status === "failed" || data.status === "ai_failed") {
+        setError(data.message || "Synchronization failed.");
+        setSyncMessage("");
+        setSyncing(false);
+      }
+    };
+
+    socket.on("sync:progress", handleSyncProgress);
+
+    return () => {
+      socket.off("sync:progress", handleSyncProgress);
+    };
+  }, [socket]);
+
   const triggerAutoSync = async () => {
     setSyncing(true);
-    setSyncMessage("Auto-syncing your GitHub profile for the first time…");
+    setSyncMessage("Initializing auto-sync...");
     try {
-      const ghSync = await API.post("/github/sync");
-      setGithubData(ghSync.data);
-
-      setSyncMessage("Generating AI career insights…");
-      const aiSync = await API.post("/ai/recommendations");
-      setAiRecommendations(aiSync.data.recommendations);
-      setSyncMessage("Sync complete!");
-      setTimeout(() => setSyncMessage(""), 3000);
+      await API.post("/github/sync");
+      await API.post("/ai/recommendations");
     } catch (err) {
       console.error("Auto sync failed:", err);
       setSyncMessage("");
-    } finally {
       setSyncing(false);
     }
   };
@@ -83,22 +115,15 @@ const Dashboard = () => {
       return;
     }
     setSyncing(true);
-    setSyncMessage("Syncing GitHub profile & repositories…");
+    setSyncMessage("Initializing sync...");
     setError("");
     try {
-      const ghSync = await API.post("/github/sync");
-      setGithubData(ghSync.data);
-
-      setSyncMessage("Generating AI career insights…");
-      const aiSync = await API.post("/ai/recommendations");
-      setAiRecommendations(aiSync.data.recommendations);
-      setSyncMessage("✓ Profile synced successfully!");
-      setTimeout(() => setSyncMessage(""), 3000);
+      await API.post("/github/sync");
+      await API.post("/ai/recommendations");
     } catch (err) {
       console.error("Sync failed:", err);
       setError(err.response?.data?.message || "Sync failed. Please try again.");
       setSyncMessage("");
-    } finally {
       setSyncing(false);
     }
   };

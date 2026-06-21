@@ -9,17 +9,23 @@ import {
   ChevronDown, 
   User as UserIcon, 
   LogOut, 
-  Settings as SettingsIcon 
+  Settings as SettingsIcon,
+  CheckCircle2,
+  AlertCircle,
+  Info
 } from "lucide-react";
 import { useTheme } from "../../context/ThemeContext";
 import { AuthContext } from "../../context/AuthContext";
+import { useSocket } from "../../context/SocketContext";
 import Chatbot from "./Chatbot";
 
 const Navbar = () => {
   const { theme, setTheme, accentColor, getAccentClass } = useTheme();
   const { user, loading, logout } = useContext(AuthContext);
+  const { notifications, unreadCount, markAllAsRead, clearNotifications } = useSocket();
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
 
   const toggleTheme = () => {
     setTheme(theme === "dark" ? "light" : "dark");
@@ -98,10 +104,76 @@ const Navbar = () => {
           </button>
 
           {/* Notifications Button */}
-          <button className="relative p-2 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/50 rounded-full transition-colors">
-            <Bell size={20} />
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-rose-500 rounded-full"></span>
-          </button>
+          <div className="relative">
+            <button
+              onClick={() => {
+                setIsNotificationsOpen(!isNotificationsOpen);
+                if (!isNotificationsOpen) {
+                  markAllAsRead();
+                }
+              }}
+              className="relative p-2 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/50 rounded-full transition-colors cursor-pointer"
+              title="Notifications"
+            >
+              <Bell size={20} />
+              {unreadCount > 0 && (
+                <span className="absolute top-1.5 right-1.5 bg-rose-500 text-white font-mono font-bold text-[9px] rounded-full min-w-4 h-4 flex items-center justify-center px-1 animate-pulse border border-white dark:border-[#1a2035]">
+                  {unreadCount}
+                </span>
+              )}
+            </button>
+
+            {/* Notifications Dropdown */}
+            {isNotificationsOpen && (
+              <>
+                <div 
+                  className="fixed inset-0 z-20 cursor-default" 
+                  onClick={() => setIsNotificationsOpen(false)}
+                />
+                <div className="absolute right-0 mt-3 w-80 bg-white dark:bg-[#1a2035] border border-slate-200 dark:border-gray-800 rounded-2xl shadow-xl py-2 z-30 animate-in fade-in slide-in-from-top-3 duration-250">
+                  <div className="px-4 py-2.5 border-b border-slate-100 dark:border-gray-800 flex justify-between items-center">
+                    <h4 className="text-xs font-bold text-slate-800 dark:text-slate-250 font-sans uppercase tracking-wider">Notifications</h4>
+                    {notifications.length > 0 && (
+                      <button
+                        onClick={clearNotifications}
+                        className="text-[10px] font-bold text-slate-450 hover:text-rose-500 transition-colors cursor-pointer"
+                      >
+                        Clear All
+                      </button>
+                    )}
+                  </div>
+                  <div className="max-h-64 overflow-y-auto">
+                    {notifications.length === 0 ? (
+                      <div className="px-4 py-8 text-center text-xs text-slate-450 dark:text-slate-400 font-sans">
+                        No notifications yet
+                      </div>
+                    ) : (
+                      notifications.map((notif) => (
+                        <div
+                          key={notif.id}
+                          className="px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800/30 border-b border-slate-100 dark:border-gray-800 last:border-b-0 flex items-start gap-3"
+                        >
+                          <div className={`flex-shrink-0 mt-0.5 ${
+                            notif.type === "success" ? "text-emerald-500" :
+                            notif.type === "error" ? "text-rose-500" : "text-indigo-500"
+                          }`}>
+                            {notif.type === "success" && <CheckCircle2 size={14} />}
+                            {notif.type === "error" && <AlertCircle size={14} />}
+                            {notif.type === "info" && <Info size={14} />}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">{notif.title}</p>
+                            <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 mt-0.5 line-clamp-2 leading-relaxed">{notif.message}</p>
+                            <p className="text-[9px] text-slate-400 dark:text-slate-500 mt-1 font-mono">{new Date(notif.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
 
           <div className="h-6 w-px bg-slate-200 dark:bg-gray-800"></div>
 

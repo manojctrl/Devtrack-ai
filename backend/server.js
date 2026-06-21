@@ -1,9 +1,14 @@
 require("dotenv").config();
 
+const http = require("http");
 const app = require("./app");
 const sequelize = require("./config/database");
+const { initSocket } = require("./config/socket");
 
 const PORT = process.env.PORT || 5000;
+
+const server = http.createServer(app);
+initSocket(server);
 
 sequelize
   .authenticate()
@@ -17,7 +22,7 @@ sequelize
 
     console.log("Tables synced");
 
-    app.listen(PORT, () => {
+    server.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
     });
   })

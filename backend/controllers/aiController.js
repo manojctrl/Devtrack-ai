@@ -1,4 +1,5 @@
 const { GithubProfile, GithubRepo, AiRecommendation, User } = require("../models");
+const { getIO } = require("../config/socket");
 
 // Robust fallback recommendation generator based on user's actual languages
 const generateFallbackRecommendations = (user, profile, repos) => {
@@ -195,10 +196,20 @@ const generateAiRecommendations = async (req, res) => {
       return res.status(404).json({ message: "User not found." });
     }
 
+    const io = getIO();
+    const emitSyncProgress = (status, message, data = null) => {
+      if (io) {
+        io.to(`user_${user.id}`).emit("sync:progress", { type: "ai", status, message, data });
+      }
+    };
+
+    emitSyncProgress("ai_started", "Generating AI career insights...");
+
     const profile = await GithubProfile.findOne({ where: { userId: user.id } });
     const repos = await GithubRepo.findAll({ where: { userId: user.id }, order: [["stars", "DESC"]] });
 
     if (!profile) {
+      emitSyncProgress("ai_failed", "Please sync your GitHub profile before generating recommendations.");
       return res.status(400).json({ message: "Please sync your GitHub profile before generating recommendations." });
     }
 
@@ -305,6 +316,8 @@ JSON Structure:
       recommendations: recommendationsData.recommendations || [],
     });
 
+    emitSyncProgress("ai_completed", isMocked ? "AI Career insights generated (offline fallback)" : "AI Career insights generated successfully", { recommendations: aiRec });
+
     return res.status(200).json({
       message: isMocked ? "Recommendations generated (offline fallback)" : "Recommendations generated successfully",
       isMocked,
@@ -312,6 +325,9 @@ JSON Structure:
     });
   } catch (error) {
     console.error("Error generating career recommendations:", error);
+    if (io) {
+      io.to(`user_${req.user.id}`).emit("sync:progress", { type: "ai", status: "ai_failed", message: error.message || "Error generating career recommendations." });
+    }
     return res.status(500).json({ message: "Server error during recommendation analysis.", error: error.message });
   }
 };
