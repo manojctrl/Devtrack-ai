@@ -6,11 +6,12 @@ import {
   IconLoader3,
   IconArrowUp
 } from "@tabler/icons-react";
-import API from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
+import { useSocket } from "../../context/SocketContext";
 
 const Chatbot = ({ isOpen, onClose }) => {
   const { user } = useAuth();
+  const { socket } = useSocket();
   const [messages, setMessages] = useState([
     {
       sender: "bot",
@@ -20,6 +21,7 @@ const Chatbot = ({ isOpen, onClose }) => {
   ]);
   const [inputText, setInputText] = useState("");
   const [loading, setLoading] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef(null);
 
   // Auto-scroll to bottom
@@ -31,12 +33,68 @@ const Chatbot = ({ isOpen, onClose }) => {
     scrollToBottom();
   }, [messages, loading]);
 
+  useEffect(() => {
+    if (!socket) return;
+
+    socket.on("chat:start", () => {
+      setLoading(false);
+      setMessages((prev) => [
+        ...prev,
+        {
+          sender: "bot",
+          text: "",
+          time: new Date()
+        }
+      ]);
+    });
+
+    socket.on("chat:chunk", (data) => {
+      setMessages((prev) => {
+        const updated = [...prev];
+        if (updated.length > 0 && updated[updated.length - 1].sender === "bot") {
+          updated[updated.length - 1].text = data.text;
+        }
+        return updated;
+      });
+    });
+
+    socket.on("chat:end", () => {
+      setIsTyping(false);
+    });
+
+    socket.on("chat:error", (data) => {
+      setMessages((prev) => {
+        const updated = [...prev];
+        const errorMessage = {
+          sender: "bot",
+          text: data.message || "An error occurred during chat processing.",
+          time: new Date()
+        };
+        if (updated.length > 0 && updated[updated.length - 1].sender === "bot" && updated[updated.length - 1].text === "") {
+          updated[updated.length - 1] = errorMessage;
+        } else {
+          updated.push(errorMessage);
+        }
+        return updated;
+      });
+      setLoading(false);
+      setIsTyping(false);
+    });
+
+    return () => {
+      socket.off("chat:start");
+      socket.off("chat:chunk");
+      socket.off("chat:end");
+      socket.off("chat:error");
+    };
+  }, [socket]);
+
   if (!isOpen) return null;
 
   const handleSend = async (e, textOverride) => {
     if (e) e.preventDefault();
     const textToSend = textOverride || inputText;
-    if (!textToSend.trim()) return;
+    if (!textToSend.trim() || loading || isTyping) return;
 
     const userMessage = {
       sender: "user",
@@ -47,34 +105,22 @@ const Chatbot = ({ isOpen, onClose }) => {
     setMessages((prev) => [...prev, userMessage]);
     if (!textOverride) setInputText("");
     setLoading(true);
+    setIsTyping(true);
 
-    try {
-      // Send message history to backend
-      const chatHistory = [...messages, userMessage].slice(-10); // Keep last 10 messages for context
-      const res = await API.post("/ai/chat", {
-        messages: chatHistory
-      });
-
+    if (socket) {
+      const chatHistory = [...messages, userMessage].slice(-10);
+      socket.emit("chat:message", { messages: chatHistory });
+    } else {
       setMessages((prev) => [
         ...prev,
         {
           sender: "bot",
-          text: res.data.reply,
+          text: "Connection is currently offline. Please wait or reload.",
           time: new Date()
         }
       ]);
-    } catch (err) {
-      console.error("Chat error:", err);
-      setMessages((prev) => [
-        ...prev,
-        {
-          sender: "bot",
-          text: "I encountered an error connecting to my AI core. Please check if your GEMINI_API_KEY is configured in backend/.env.",
-          time: new Date()
-        }
-      ]);
-    } finally {
       setLoading(false);
+      setIsTyping(false);
     }
   };
 
@@ -177,7 +223,7 @@ const Chatbot = ({ isOpen, onClose }) => {
         />
         <button 
           type="submit"
-          disabled={!inputText.trim() || loading}
+          disabled={!inputText.trim() || loading || isTyping}
           className="w-9 h-9 rounded-2xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 disabled:hover:bg-indigo-600 text-white flex items-center justify-center shadow-lg shadow-indigo-600/15 transition cursor-pointer shrink-0"
         >
           <IconArrowUp size={16} />

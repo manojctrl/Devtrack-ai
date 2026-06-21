@@ -16,7 +16,7 @@ import { RefreshCw, Wifi, WifiOff } from "lucide-react";
 
 const Dashboard = () => {
   const { user } = useAuth();
-  const socket = useSocket();
+  const { socket } = useSocket();
   const [githubData, setGithubData] = useState(null);
   const [aiRecommendations, setAiRecommendations] = useState(null);
   const [loading, setLoading] = useState(true);
