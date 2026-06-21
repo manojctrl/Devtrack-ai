@@ -1,6 +1,12 @@
-const { GithubProfile, GithubRepo, User } = require("../models");
+const { GithubProfile, GithubRepo, User, sequelize } = require("../models");
 
-// Helper to generate realistic mock GitHub data if rate limited or offline
+// ─── Constants ────────────────────────────────────────────────────────────────
+const REPOS_PER_PAGE = 100;
+const EVENTS_PER_PAGE = 100;
+const MAX_RECENT_ACTIVITY = 10;
+const SUPPORTED_EVENT_TYPES = ["PushEvent", "CreateEvent", "WatchEvent", "PullRequestEvent", "IssuesEvent"];
+
+// ─── Mock Data Generator ──────────────────────────────────────────────────────
 const generateMockGithubData = (username) => {
   const languages = {
     JavaScript: Math.floor(Math.random() * 15) + 5,
@@ -10,14 +16,12 @@ const generateMockGithubData = (username) => {
     CSS: Math.floor(Math.random() * 5) + 2,
   };
 
-  // Generate heatmap for the last 60 days
   const contributionHeatmap = {};
   const today = new Date();
   for (let i = 0; i < 60; i++) {
     const d = new Date(today);
     d.setDate(today.getDate() - i);
     const dateString = d.toISOString().split("T")[0];
-    // Random activity: 70% chance of contribution (1-8 commits)
     if (Math.random() > 0.3) {
       contributionHeatmap[dateString] = Math.floor(Math.random() * 8) + 1;
     }
@@ -75,8 +79,9 @@ const generateMockGithubData = (username) => {
       following: 38,
       publicRepos: mockRepos.length,
       totalStars: 28,
+      // NOTE: totalCommits from mock — not reliable, labeled accordingly
       totalCommits: 247,
-      avatarUrl: `https://avatars.githubusercontent.com/u/9919?v=4`,
+      avatarUrl: null, // No real avatar in mock mode
       htmlUrl: `https://github.com/${username}`,
       bio: "Full Stack Developer passionate about web apps and AI integrations.",
       company: "Freelance",
@@ -90,6 +95,84 @@ const generateMockGithubData = (username) => {
   };
 };
 
+// ─── Helper: Build GitHub request headers ─────────────────────────────────────
+const buildGithubHeaders = () => {
+  const headers = { "User-Agent": "DevTrack-AI-Application" };
+  if (process.env.GITHUB_TOKEN) {
+    headers["Authorization"] = `token ${process.env.GITHUB_TOKEN}`;
+  }
+  return headers;
+};
+
+// ─── Helper: Safe fetch with rate-limit detection ────────────────────────────
+const githubFetch = async (url, headers) => {
+  const res = await fetch(url, { headers });
+
+  if (res.status === 403 || res.status === 429) {
+    console.warn(`GitHub API rate limit hit for: ${url}`);
+    return { rateLimited: true, data: null };
+  }
+  if (res.status === 404) {
+    return { notFound: true, data: null };
+  }
+  if (!res.ok) {
+    throw new Error(`GitHub API error ${res.status} for ${url}`);
+  }
+
+  const data = await res.json();
+  return { rateLimited: false, notFound: false, data };
+};
+
+// ─── Helper: Process events into heatmap + recent activity ───────────────────
+const processEvents = (eventsData) => {
+  const contributionHeatmap = {};
+  const recentActivity = [];
+  let totalCommitsFromEvents = 0;
+
+  for (const event of eventsData) {
+    if (!event.created_at) continue;
+
+    const dateStr = event.created_at.split("T")[0];
+    let contributionCount = 1;
+
+    if (event.type === "PushEvent" && event.payload?.commits) {
+      contributionCount = event.payload.commits.length;
+      totalCommitsFromEvents += contributionCount;
+    }
+
+    contributionHeatmap[dateStr] = (contributionHeatmap[dateStr] || 0) + contributionCount;
+
+    if (recentActivity.length < MAX_RECENT_ACTIVITY && SUPPORTED_EVENT_TYPES.includes(event.type)) {
+      const activityEntry = {
+        type: event.type,
+        repo: event.repo?.name || "unknown",
+        count: 1,
+        date: event.created_at,
+      };
+
+      if (event.type === "PushEvent") {
+        activityEntry.count = event.payload?.commits?.length || 1;
+      }
+
+      recentActivity.push(activityEntry);
+    }
+  }
+
+  return { contributionHeatmap, recentActivity, totalCommitsFromEvents };
+};
+
+// ─── Helper: Build language distribution from repos ──────────────────────────
+const buildLanguageMap = (reposData) => {
+  const languages = {};
+  for (const repo of reposData) {
+    if (repo.language) {
+      languages[repo.language] = (languages[repo.language] || 0) + 1;
+    }
+  }
+  return languages;
+};
+
+// ─── Controller: Sync GitHub Data ────────────────────────────────────────────
 const syncGithubData = async (req, res) => {
   try {
     const user = await User.findByPk(req.user.id);
@@ -98,200 +181,145 @@ const syncGithubData = async (req, res) => {
     }
 
     const username = user.githubUsername.trim();
-    const headers = {
-      "User-Agent": "DevTrack-AI-Application",
-    };
+    const headers = buildGithubHeaders();
 
-    // If GitHub Token is available in environment, use it to avoid rate limits
-    if (process.env.GITHUB_TOKEN) {
-      headers["Authorization"] = `token ${process.env.GITHUB_TOKEN}`;
-    }
-
-    let profileData;
-    let reposData = [];
-    let eventsData = [];
+    let finalProfile = {};
+    let finalRepos = [];
     let isMocked = false;
 
     try {
       // 1. Fetch Profile
-      const profileRes = await fetch(`https://api.github.com/users/${username}`, { headers });
-      if (profileRes.status === 403 || profileRes.status === 429) {
-        console.warn("GitHub API rate limit hit, using mock data fallback.");
-        isMocked = true;
-      } else if (profileRes.status === 404) {
+      const profileResult = await githubFetch(`https://api.github.com/users/${username}`, headers);
+
+      if (profileResult.notFound) {
         return res.status(404).json({ message: `GitHub user '${username}' not found.` });
-      } else if (!profileRes.ok) {
-        throw new Error(`GitHub API profile returned ${profileRes.status}`);
-      } else {
-        profileData = await profileRes.json();
       }
 
-      if (!isMocked) {
-        // 2. Fetch Repositories
-        const reposRes = await fetch(`https://api.github.com/users/${username}/repos?per_page=100&sort=updated`, { headers });
-        if (reposRes.ok) {
-          reposData = await reposRes.json();
-        }
+      if (profileResult.rateLimited) {
+        isMocked = true;
+      } else {
+        const profileData = profileResult.data;
 
-        // 3. Fetch Events for Heatmap
-        const eventsRes = await fetch(`https://api.github.com/users/${username}/events?per_page=100`, { headers });
-        if (eventsRes.ok) {
-          eventsData = await eventsRes.json();
-        }
+        // 2. Fetch Repositories
+        const reposResult = await githubFetch(
+          `https://api.github.com/users/${username}/repos?per_page=${REPOS_PER_PAGE}&sort=updated`,
+          headers
+        );
+        const reposData = reposResult.data || [];
+
+        // 3. Fetch Events for Heatmap + Activity
+        const eventsResult = await githubFetch(
+          `https://api.github.com/users/${username}/events?per_page=${EVENTS_PER_PAGE}`,
+          headers
+        );
+        const eventsData = eventsResult.data || [];
+
+        // Process data
+        const totalStars = reposData.reduce((acc, repo) => acc + (repo.stargazers_count || 0), 0);
+        const languages = buildLanguageMap(reposData);
+        const { contributionHeatmap, recentActivity, totalCommitsFromEvents } = processEvents(eventsData);
+
+        // NOTE: totalCommits is an approximation. GitHub API does not expose
+        // total commit counts per user directly without GraphQL or scraping.
+        const totalCommits = totalCommitsFromEvents;
+
+        finalProfile = {
+          followers: profileData.followers || 0,
+          following: profileData.following || 0,
+          publicRepos: profileData.public_repos || 0,
+          totalStars,
+          totalCommits,
+          avatarUrl: profileData.avatar_url || null,
+          htmlUrl: profileData.html_url || null,
+          bio: profileData.bio || null,
+          company: profileData.company || null,
+          location: profileData.location || null,
+          contributionHeatmap,
+          languages,
+          recentActivity,
+          lastSyncedAt: new Date(),
+        };
+
+        finalRepos = reposData.map((repo) => ({
+          name: repo.name,
+          description: repo.description || null,
+          htmlUrl: repo.html_url,
+          stars: repo.stargazers_count || 0,
+          forks: repo.forks_count || 0,
+          language: repo.language || null,
+          updatedAt: repo.updated_at ? new Date(repo.updated_at) : new Date(),
+        }));
       }
     } catch (apiError) {
-      console.error("GitHub API communication error:", apiError);
+      console.error("GitHub API communication error:", apiError.message);
       isMocked = true;
     }
-
-    let finalProfile = {};
-    let finalRepos = [];
 
     if (isMocked) {
       const mock = generateMockGithubData(username);
       finalProfile = mock.profile;
       finalRepos = mock.repos;
-    } else {
-      // Process Real API Data
-      const totalStars = reposData.reduce((acc, repo) => acc + (repo.stargazers_count || 0), 0);
-
-      // Process languages distribution
-      const languages = {};
-      reposData.forEach((repo) => {
-        if (repo.language) {
-          languages[repo.language] = (languages[repo.language] || 0) + 1;
-        }
-      });
-
-      // Process heatmap contribution & recent activities from Events
-      const contributionHeatmap = {};
-      const recentActivity = [];
-      let totalCommitsFromEvents = 0;
-
-      eventsData.forEach((event) => {
-        if (!event.created_at) return;
-        const dateStr = event.created_at.split("T")[0];
-
-        let contributionCount = 1;
-        if (event.type === "PushEvent" && event.payload && event.payload.commits) {
-          contributionCount = event.payload.commits.length;
-          totalCommitsFromEvents += contributionCount;
-        }
-
-        contributionHeatmap[dateStr] = (contributionHeatmap[dateStr] || 0) + contributionCount;
-
-        // Log recent activities (limit to top 10)
-        if (recentActivity.length < 10) {
-          if (event.type === "PushEvent") {
-            recentActivity.push({
-              type: "PushEvent",
-              repo: event.repo.name,
-              count: event.payload.commits ? event.payload.commits.length : 1,
-              date: event.created_at,
-            });
-          } else if (event.type === "CreateEvent") {
-            recentActivity.push({
-              type: "CreateEvent",
-              repo: event.repo.name,
-              count: 1,
-              date: event.created_at,
-            });
-          } else if (event.type === "WatchEvent") {
-            recentActivity.push({
-              type: "WatchEvent",
-              repo: event.repo.name,
-              count: 1,
-              date: event.created_at,
-            });
-          }
-        }
-      });
-
-      const totalCommits = reposData.length * 15 + totalCommitsFromEvents; // Estimate baseline commits
-
-      finalProfile = {
-        followers: profileData.followers || 0,
-        following: profileData.following || 0,
-        publicRepos: profileData.public_repos || 0,
-        totalStars,
-        totalCommits,
-        avatarUrl: profileData.avatar_url || null,
-        htmlUrl: profileData.html_url || null,
-        bio: profileData.bio || null,
-        company: profileData.company || null,
-        location: profileData.location || null,
-        contributionHeatmap,
-        languages,
-        recentActivity,
-        lastSyncedAt: new Date(),
-      };
-
-      finalRepos = reposData.map((repo) => ({
-        name: repo.name,
-        description: repo.description || null,
-        htmlUrl: repo.html_url,
-        stars: repo.stargazers_count || 0,
-        forks: repo.forks_count || 0,
-        language: repo.language || null,
-        updatedAt: repo.updated_at ? new Date(repo.updated_at) : new Date(),
-      }));
     }
 
-    // Save GitHub Profile
     let [githubProfile] = await GithubProfile.findOrCreate({
       where: { userId: user.id },
       defaults: { userId: user.id },
     });
-
     await githubProfile.update(finalProfile);
 
-    // Refresh Repositories
-    await GithubRepo.destroy({ where: { userId: user.id } });
-    const repoRecords = finalRepos.map((repo) => ({
-      ...repo,
-      userId: user.id,
-    }));
-    await GithubRepo.bulkCreate(repoRecords);
+    await sequelize.transaction(async (t) => {
+      await GithubRepo.destroy({ where: { userId: user.id }, transaction: t });
+      await GithubRepo.bulkCreate(
+        finalRepos.map((repo) => ({ ...repo, userId: user.id })),
+        { transaction: t }
+      );
+    });
 
-    // Also update User profile fields if they are empty
-    let userChanged = false;
-    if (!user.profilePicture && finalProfile.avatarUrl) {
-      user.profilePicture = finalProfile.avatarUrl;
-      userChanged = true;
-    }
-    if (!user.bio && finalProfile.bio) {
-      user.bio = finalProfile.bio;
-      userChanged = true;
-    }
-    if (!user.location && finalProfile.location) {
-      user.location = finalProfile.location;
-      userChanged = true;
-    }
-    if (userChanged) {
-      await user.save();
-    }
+    // ── Update User profile fields if currently empty ────────────────────────
+    const userUpdates = {};
+    if (!user.profilePicture && finalProfile.avatarUrl) userUpdates.profilePicture = finalProfile.avatarUrl;
+    if (!user.bio && finalProfile.bio) userUpdates.bio = finalProfile.bio;
+    if (!user.location && finalProfile.location) userUpdates.location = finalProfile.location;
+    if (Object.keys(userUpdates).length > 0) await user.update(userUpdates);
 
     return res.status(200).json({
-      message: isMocked ? "GitHub Sync successful (using offline fallback mode)" : "GitHub Sync successful",
+      message: isMocked
+        ? "GitHub Sync successful (using offline fallback mode)"
+        : "GitHub Sync successful",
       isMocked,
+      lastSyncedAt: finalProfile.lastSyncedAt,
       profile: githubProfile,
       repos: finalRepos,
     });
   } catch (error) {
     console.error("Error syncing GitHub data:", error);
-    return res.status(500).json({ message: "Server error during GitHub synchronization.", error: error.message });
+    return res.status(500).json({
+      message: "Server error during GitHub synchronization.",
+      error: error.message,
+    });
   }
 };
 
+// ─── Controller: Get GitHub Data ─────────────────────────────────────────────
 const getGithubData = async (req, res) => {
   try {
     const profile = await GithubProfile.findOne({ where: { userId: req.user.id } });
-    const repos = await GithubRepo.findAll({ where: { userId: req.user.id }, order: [["stars", "DESC"]] });
+    const repos = await GithubRepo.findAll({
+      where: { userId: req.user.id },
+      order: [["stars", "DESC"]],
+    });
+
+    if (!profile) {
+      return res.status(404).json({ message: "No GitHub data found. Please sync your GitHub profile first." });
+    }
 
     return res.status(200).json({ profile, repos });
   } catch (error) {
     console.error("Error retrieving GitHub data:", error);
-    return res.status(500).json({ message: "Server error while retrieving GitHub data.", error: error.message });
+    return res.status(500).json({
+      message: "Server error while retrieving GitHub data.",
+      error: error.message,
+    });
   }
 };
 
