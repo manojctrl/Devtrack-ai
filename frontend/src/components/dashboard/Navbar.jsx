@@ -22,7 +22,7 @@ import Chatbot from "./Chatbot";
 const Navbar = () => {
   const { theme, setTheme, accentColor, getAccentClass } = useTheme();
   const { user, loading, logout } = useContext(AuthContext);
-  const { notifications, unreadCount, markAllAsRead, clearNotifications } = useSocket();
+  const { notifications, unreadCount, markAllAsRead, clearNotifications, isConnected } = useSocket();
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
@@ -94,10 +94,21 @@ const Navbar = () => {
             </span>
           </button>
 
+          {/* Connection Status Indicator */}
+          <div 
+            className="flex items-center gap-1.5 px-3 py-1 rounded-full border border-slate-200 dark:border-gray-800 bg-slate-50/50 dark:bg-slate-900/30 text-[10px] font-bold font-sans tracking-wide"
+            title={isConnected ? "Connected to Socket server" : "Disconnected from Socket server"}
+          >
+            <span className={`w-1.5 h-1.5 rounded-full ${isConnected ? "bg-emerald-500 animate-pulse shadow-sm shadow-emerald-500/50" : "bg-rose-500 shadow-sm shadow-rose-500/50"}`}></span>
+            <span className="text-slate-500 dark:text-slate-400 uppercase">
+              {isConnected ? "Live" : "Offline"}
+            </span>
+          </div>
+
           {/* Theme Switcher Button */}
           <button
             onClick={toggleTheme}
-            className="p-2 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/50 rounded-full transition-colors"
+            className="p-2 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/50 rounded-full transition-colors cursor-pointer"
             title={theme === "dark" ? "Switch to Light Mode" : "Switch to Dark Mode"}
           >
             {theme === "dark" ? <Sun size={20} /> : <Moon size={20} />}

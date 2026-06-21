@@ -18,6 +18,7 @@ export const SocketProvider = ({ children }) => {
   const [socket, setSocket] = useState(null);
   const [notifications, setNotifications] = useState([]);
   const [toasts, setToasts] = useState([]);
+  const [isConnected, setIsConnected] = useState(false);
 
   const addNotification = (title, message, type = "info") => {
     const newNotif = {
@@ -64,6 +65,7 @@ export const SocketProvider = ({ children }) => {
         socket.disconnect();
         setSocket(null);
       }
+      setIsConnected(false);
       return;
     }
 
@@ -79,10 +81,17 @@ export const SocketProvider = ({ children }) => {
 
     newSocket.on("connect", () => {
       console.log("Connected to Socket.IO backend:", newSocket.id);
+      setIsConnected(true);
     });
 
     newSocket.on("connect_error", (err) => {
       console.error("Socket connection error:", err.message);
+      setIsConnected(false);
+    });
+
+    newSocket.on("disconnect", () => {
+      console.log("Disconnected from Socket.IO backend");
+      setIsConnected(false);
     });
 
     // Listen to sync progress and trigger notifications for major milestones
@@ -114,6 +123,7 @@ export const SocketProvider = ({ children }) => {
         removeToast,
         markAllAsRead,
         clearNotifications,
+        isConnected,
       }}
     >
       {children}
