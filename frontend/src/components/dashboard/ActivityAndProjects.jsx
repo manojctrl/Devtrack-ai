@@ -40,7 +40,6 @@ const ActivityAndProjects = ({ profile, repos }) => {
     const result = [];
     const today = new Date();
     
-    // Calculate commits for last 5 months
     for (let i = 4; i >= 0; i--) {
       const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
       const mName = months[d.getMonth()];

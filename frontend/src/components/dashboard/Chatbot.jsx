@@ -1,10 +1,10 @@
 import { useState, useEffect, useRef } from "react";
-import { 
-  IconMessageChatbot, 
-  IconX, 
-  IconSparkles, 
+import {
+  IconMessageChatbot,
+  IconX,
+  IconSparkles,
   IconLoader3,
-  IconArrowUp
+  IconArrowUp,
 } from "@tabler/icons-react";
 import { useAuth } from "../../context/AuthContext";
 import { useSocket } from "../../context/SocketContext";
@@ -16,15 +16,14 @@ const Chatbot = ({ isOpen, onClose }) => {
     {
       sender: "bot",
       text: `Hello ${user?.firstName || "Developer"}! I am your DevTrack AI Assistant. I have analyzed your profile and GitHub metrics. Ask me anything about career guidance, learning roadmaps, resume feedback, or technical queries!`,
-      time: new Date()
-    }
+      time: new Date(),
+    },
   ]);
   const [inputText, setInputText] = useState("");
   const [loading, setLoading] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef(null);
 
-  // Auto-scroll to bottom
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
@@ -40,18 +39,17 @@ const Chatbot = ({ isOpen, onClose }) => {
       setLoading(false);
       setMessages((prev) => [
         ...prev,
-        {
-          sender: "bot",
-          text: "",
-          time: new Date()
-        }
+        { sender: "bot", text: "", time: new Date() },
       ]);
     });
 
     socket.on("chat:chunk", (data) => {
       setMessages((prev) => {
         const updated = [...prev];
-        if (updated.length > 0 && updated[updated.length - 1].sender === "bot") {
+        if (
+          updated.length > 0 &&
+          updated[updated.length - 1].sender === "bot"
+        ) {
           updated[updated.length - 1].text = data.text;
         }
         return updated;
@@ -68,9 +66,13 @@ const Chatbot = ({ isOpen, onClose }) => {
         const errorMessage = {
           sender: "bot",
           text: data.message || "An error occurred during chat processing.",
-          time: new Date()
+          time: new Date(),
         };
-        if (updated.length > 0 && updated[updated.length - 1].sender === "bot" && updated[updated.length - 1].text === "") {
+        if (
+          updated.length > 0 &&
+          updated[updated.length - 1].sender === "bot" &&
+          updated[updated.length - 1].text === ""
+        ) {
           updated[updated.length - 1] = errorMessage;
         } else {
           updated.push(errorMessage);
@@ -99,7 +101,7 @@ const Chatbot = ({ isOpen, onClose }) => {
     const userMessage = {
       sender: "user",
       text: textToSend,
-      time: new Date()
+      time: new Date(),
     };
 
     setMessages((prev) => [...prev, userMessage]);
@@ -116,8 +118,8 @@ const Chatbot = ({ isOpen, onClose }) => {
         {
           sender: "bot",
           text: "Connection is currently offline. Please wait or reload.",
-          time: new Date()
-        }
+          time: new Date(),
+        },
       ]);
       setLoading(false);
       setIsTyping(false);
@@ -125,111 +127,390 @@ const Chatbot = ({ isOpen, onClose }) => {
   };
 
   return (
-    <div className="fixed bottom-6 right-6 w-96 h-[540px] bg-[#101524]/90 dark:bg-[#0e1322]/95 border border-slate-250 dark:border-slate-800 rounded-3xl shadow-2xl flex flex-col overflow-hidden backdrop-blur-xl z-[999] animate-fadeUp">
-      {/* Header */}
-      <div className="p-4 bg-gradient-to-r from-indigo-600 via-indigo-700 to-purple-700 text-white flex items-center justify-between shrink-0 shadow-lg shadow-indigo-900/10">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl bg-white/10 flex items-center justify-center border border-white/20 text-white shadow-inner">
-            <IconMessageChatbot size={22} className="text-white" />
-          </div>
-          <div>
-            <div className="text-sm font-bold tracking-wide flex items-center gap-1.5">
-              <span>DevTrack Assistant</span>
-              <span className="p-0.5 rounded bg-emerald-500 text-[8px] uppercase font-bold tracking-widest text-emerald-950">AI Live</span>
-            </div>
-            <div className="text-[10px] text-indigo-200">Your Technical Career Coach</div>
-          </div>
-        </div>
-        
-        <button 
-          onClick={onClose}
-          className="p-1.5 hover:bg-white/10 rounded-xl transition text-white/80 hover:text-white cursor-pointer"
-        >
-          <IconX size={18} />
-        </button>
-      </div>
+    <>
+      <style>{`
+        @keyframes devChatFadeUp {
+          from { opacity: 0; transform: translateY(20px) scale(0.97); }
+          to   { opacity: 1; transform: translateY(0)   scale(1);    }
+        }
+        @keyframes devChatBlink {
+          0%, 100% { opacity: 1; }
+          50%       { opacity: 0.2; }
+        }
+        @keyframes devChatSlideIn {
+          from { opacity: 0; transform: translateX(10px); }
+          to   { opacity: 1; transform: translateX(0);    }
+        }
+        .devtrack-chat-wrap {
+          animation: devChatFadeUp 0.35s cubic-bezier(0.16,1,0.3,1) both;
+        }
+        .devtrack-msg-animate {
+          animation: devChatSlideIn 0.2s ease both;
+        }
+        .devtrack-dot {
+          animation: devChatBlink 1.2s ease-in-out infinite;
+        }
+        .devtrack-dot:nth-child(2) { animation-delay: 0.2s; }
+        .devtrack-dot:nth-child(3) { animation-delay: 0.4s; }
+        .devtrack-messages::-webkit-scrollbar { width: 3px; }
+        .devtrack-messages::-webkit-scrollbar-track { background: transparent; }
+        .devtrack-messages::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+        .devtrack-chip:hover {
+          border-color: rgba(99,102,241,0.45) !important;
+          color: #e2e8f0 !important;
+          background: #1a2542 !important;
+        }
+        .devtrack-send:hover { background: #6366f1 !important; }
+        .devtrack-close:hover { background: rgba(255,255,255,0.12) !important; color: #fff !important; }
+      `}</style>
 
-      {/* Messages list */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 font-sans text-xs scrollbar-thin scrollbar-thumb-slate-850">
-        {messages.map((msg, index) => {
-          const isBot = msg.sender === "bot";
-          return (
-            <div 
-              key={index}
-              className={`flex items-start gap-2.5 max-w-[85%] ${isBot ? "mr-auto" : "ml-auto flex-row-reverse"}`}
+      <div
+        className="devtrack-chat-wrap"
+        style={{
+          position: "fixed",
+          bottom: "24px",
+          right: "24px",
+          width: "384px",
+          height: "560px",
+          background: "#0e1322",
+          border: "1px solid #1e2640",
+          borderRadius: "28px",
+          boxShadow: "0 32px 80px rgba(0,0,0,0.55), 0 0 0 1px rgba(99,102,241,0.08)",
+          display: "flex",
+          flexDirection: "column",
+          overflow: "hidden",
+          zIndex: 999,
+          fontFamily: "system-ui, -apple-system, sans-serif",
+        }}
+      >
+        {/* ── Header ── */}
+        <div
+          style={{
+            padding: "14px 16px",
+            background: "linear-gradient(135deg, #4338ca 0%, #5b21b6 100%)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            flexShrink: 0,
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+            <div
+              style={{
+                width: "42px",
+                height: "42px",
+                borderRadius: "14px",
+                background: "rgba(255,255,255,0.12)",
+                border: "1px solid rgba(255,255,255,0.2)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
             >
-              {isBot && (
-                <div className="w-7 h-7 rounded-xl bg-indigo-500/15 border border-indigo-500/20 text-indigo-400 flex items-center justify-center shrink-0">
-                  <IconSparkles size={14} />
-                </div>
-              )}
-              <div 
-                className={`p-3 rounded-2xl leading-relaxed whitespace-pre-line shadow-sm border ${
-                  isBot 
-                    ? "bg-[#181f34] border-[#1d2744] text-slate-200 rounded-tl-none" 
-                    : "bg-indigo-600 border-indigo-500 text-white rounded-tr-none"
-                }`}
+              <IconMessageChatbot size={22} color="#fff" />
+            </div>
+            <div>
+              <div
+                style={{
+                  fontSize: "13px",
+                  fontWeight: 700,
+                  color: "#fff",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "7px",
+                  letterSpacing: "0.01em",
+                }}
               >
-                {msg.text}
+                DevTrack Assistant
+                <span
+                  style={{
+                    background: "#10b981",
+                    color: "#064e3b",
+                    fontSize: "8px",
+                    fontWeight: 800,
+                    letterSpacing: "0.08em",
+                    padding: "2px 6px",
+                    borderRadius: "5px",
+                    textTransform: "uppercase",
+                  }}
+                >
+                  AI Live
+                </span>
+              </div>
+              <div style={{ fontSize: "10px", color: "#a5b4fc", marginTop: "1px" }}>
+                Your Technical Career Coach
               </div>
             </div>
-          );
-        })}
-        {messages.length === 1 && !loading && (
-          <div className="pl-9 pr-4 py-2 space-y-2">
-            <p className="text-[10px] text-slate-500 font-semibold uppercase tracking-wider">Suggested Prompts</p>
-            <div className="flex flex-col gap-2">
+          </div>
+
+          <button
+            onClick={onClose}
+            className="devtrack-close"
+            style={{
+              width: "30px",
+              height: "30px",
+              borderRadius: "10px",
+              border: "none",
+              background: "transparent",
+              color: "rgba(255,255,255,0.65)",
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              transition: "background 0.15s, color 0.15s",
+            }}
+          >
+            <IconX size={17} />
+          </button>
+        </div>
+
+        {/* ── Messages ── */}
+        <div
+          className="devtrack-messages"
+          style={{
+            flex: 1,
+            overflowY: "auto",
+            padding: "16px 14px",
+            display: "flex",
+            flexDirection: "column",
+            gap: "12px",
+          }}
+        >
+          {messages.map((msg, index) => {
+            const isBot = msg.sender === "bot";
+            return (
+              <div
+                key={index}
+                className="devtrack-msg-animate"
+                style={{
+                  display: "flex",
+                  alignItems: "flex-start",
+                  gap: "9px",
+                  maxWidth: "87%",
+                  marginLeft: isBot ? 0 : "auto",
+                  flexDirection: isBot ? "row" : "row-reverse",
+                }}
+              >
+                {isBot && (
+                  <div
+                    style={{
+                      width: "28px",
+                      height: "28px",
+                      borderRadius: "10px",
+                      background: "rgba(99,102,241,0.15)",
+                      border: "1px solid rgba(99,102,241,0.28)",
+                      color: "#818cf8",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      flexShrink: 0,
+                    }}
+                  >
+                    <IconSparkles size={13} />
+                  </div>
+                )}
+                <div
+                  style={{
+                    padding: "10px 13px",
+                    borderRadius: isBot ? "4px 16px 16px 16px" : "16px 4px 16px 16px",
+                    fontSize: "11.5px",
+                    lineHeight: "1.65",
+                    whiteSpace: "pre-line",
+                    ...(isBot
+                      ? {
+                          background: "#151d30",
+                          border: "1px solid #1d2744",
+                          color: "#cbd5e1",
+                        }
+                      : {
+                          background: "#4338ca",
+                          border: "1px solid #6366f1",
+                          color: "#fff",
+                        }),
+                  }}
+                >
+                  {msg.text}
+                </div>
+              </div>
+            );
+          })}
+
+          {/* Suggested chips — shown only initially */}
+          {messages.length === 1 && !loading && (
+            <div style={{ marginTop: "4px" }}>
+              <p
+                style={{
+                  fontSize: "9px",
+                  color: "#475569",
+                  fontWeight: 700,
+                  textTransform: "uppercase",
+                  letterSpacing: "0.08em",
+                  marginBottom: "8px",
+                  paddingLeft: "37px",
+                }}
+              >
+                Suggested Prompts
+              </p>
               {[
-                { label: "💡 What should I learn next?", text: "What skills or technologies should I learn next based on my profile?" },
-                { label: "📄 Review my resume readiness", text: "How can I improve my resume template and details to get more callbacks?" },
-                { label: "🚀 Explain my developer metrics", text: "Give me an analysis of my current GitHub developer level and contribution metrics." }
+                {
+                  label: "💡 What should I learn next?",
+                  text: "What skills or technologies should I learn next based on my profile?",
+                },
+                {
+                  label: "📄 Review my resume readiness",
+                  text: "How can I improve my resume template and details to get more callbacks?",
+                },
+                {
+                  label: "🚀 Explain my developer metrics",
+                  text: "Give me an analysis of my current GitHub developer level and contribution metrics.",
+                },
               ].map((chip, idx) => (
                 <button
                   key={idx}
                   type="button"
+                  className="devtrack-chip"
                   onClick={() => handleSend(null, chip.text)}
-                  className="w-full text-left p-2.5 rounded-xl bg-[#131b2e] border border-[#1a2542] hover:border-indigo-500/40 text-slate-350 hover:text-white text-[11px] transition-all duration-200 cursor-pointer shadow-sm hover:shadow-indigo-500/5"
+                  style={{
+                    display: "block",
+                    width: "calc(100% - 37px)",
+                    marginLeft: "37px",
+                    padding: "9px 12px",
+                    marginBottom: "7px",
+                    background: "#131b2e",
+                    border: "1px solid #1a2542",
+                    borderRadius: "12px",
+                    color: "#94a3b8",
+                    fontSize: "11px",
+                    textAlign: "left",
+                    cursor: "pointer",
+                    transition: "all 0.15s",
+                  }}
                 >
                   {chip.label}
                 </button>
               ))}
             </div>
-          </div>
-        )}
-        {loading && (
-          <div className="flex items-start gap-2.5 max-w-[85%] mr-auto">
-            <div className="w-7 h-7 rounded-xl bg-indigo-500/15 border border-indigo-500/20 text-indigo-400 flex items-center justify-center shrink-0">
-              <IconLoader3 size={14} className="animate-spin" />
-            </div>
-            <div className="p-3 bg-[#181f34] border border-[#1d2744] rounded-2xl rounded-tl-none text-slate-400 italic">
-              AI is brainstorming...
-            </div>
-          </div>
-        )}
-        <div ref={messagesEndRef} />
-      </div>
+          )}
 
-      {/* Input Form */}
-      <form 
-        onSubmit={handleSend}
-        className="p-3 bg-[#0c101b] border-t border-slate-900 flex items-center gap-2 shrink-0"
-      >
-        <input 
-          type="text"
-          value={inputText}
-          onChange={(e) => setInputText(e.target.value)}
-          placeholder="Ask me about coding, stack tips or resume..."
-          className="flex-1 px-4 py-2.5 rounded-2xl bg-slate-900 border border-slate-800 text-slate-100 text-xs focus:border-indigo-500/60 focus:outline-none placeholder-slate-500 transition-colors"
-        />
-        <button 
-          type="submit"
-          disabled={!inputText.trim() || loading || isTyping}
-          className="w-9 h-9 rounded-2xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 disabled:hover:bg-indigo-600 text-white flex items-center justify-center shadow-lg shadow-indigo-600/15 transition cursor-pointer shrink-0"
+          {/* Typing indicator */}
+          {loading && (
+            <div
+              style={{
+                display: "flex",
+                alignItems: "flex-start",
+                gap: "9px",
+                maxWidth: "87%",
+              }}
+            >
+              <div
+                style={{
+                  width: "28px",
+                  height: "28px",
+                  borderRadius: "10px",
+                  background: "rgba(99,102,241,0.15)",
+                  border: "1px solid rgba(99,102,241,0.28)",
+                  color: "#818cf8",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexShrink: 0,
+                }}
+              >
+                <IconLoader3 size={13} style={{ animation: "spin 0.8s linear infinite" }} />
+              </div>
+              <div
+                style={{
+                  padding: "12px 16px",
+                  background: "#151d30",
+                  border: "1px solid #1d2744",
+                  borderRadius: "4px 16px 16px 16px",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "5px",
+                }}
+              >
+                {[0, 1, 2].map((i) => (
+                  <span
+                    key={i}
+                    className="devtrack-dot"
+                    style={{
+                      display: "block",
+                      width: "6px",
+                      height: "6px",
+                      borderRadius: "50%",
+                      background: "#818cf8",
+                    }}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div ref={messagesEndRef} />
+        </div>
+
+        {/* ── Input ── */}
+        <form
+          onSubmit={handleSend}
+          style={{
+            padding: "10px 12px",
+            background: "#0a0f1c",
+            borderTop: "1px solid #111827",
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+            flexShrink: 0,
+          }}
         >
-          <IconArrowUp size={16} />
-        </button>
-      </form>
-    </div>
+          <input
+            type="text"
+            value={inputText}
+            onChange={(e) => setInputText(e.target.value)}
+            placeholder="Ask me about coding, stack tips or resume..."
+            style={{
+              flex: 1,
+              padding: "9px 15px",
+              borderRadius: "16px",
+              background: "#0f172a",
+              border: "1px solid #1e293b",
+              color: "#e2e8f0",
+              fontSize: "11.5px",
+              outline: "none",
+              transition: "border-color 0.15s",
+            }}
+            onFocus={(e) => (e.target.style.borderColor = "rgba(99,102,241,0.5)")}
+            onBlur={(e) => (e.target.style.borderColor = "#1e293b")}
+          />
+          <button
+            type="submit"
+            disabled={!inputText.trim() || loading || isTyping}
+            className="devtrack-send"
+            style={{
+              width: "36px",
+              height: "36px",
+              borderRadius: "12px",
+              background: "#4338ca",
+              border: "none",
+              color: "#fff",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              cursor: "pointer",
+              flexShrink: 0,
+              opacity: !inputText.trim() || loading || isTyping ? 0.4 : 1,
+              transition: "background 0.15s, opacity 0.15s",
+            }}
+          >
+            <IconArrowUp size={16} />
+          </button>
+        </form>
+
+        {/* Inline keyframes for spinner */}
+        <style>{`
+          @keyframes spin { to { transform: rotate(360deg); } }
+        `}</style>
+      </div>
+    </>
   );
 };
 
