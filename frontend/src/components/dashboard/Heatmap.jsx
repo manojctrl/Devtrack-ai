@@ -16,7 +16,6 @@ export default function ContributionHeatmap({ profile }) {
   const [selectedYear, setSelectedYear] = useState("lastYear");
   const [tooltip, setTooltip] = useState(null);
 
-  // Extract unique years from the contribution heatmap dates
   const years = useMemo(() => {
     const heatmap = profile?.contributionHeatmap || {};
     const yearSet = new Set();
@@ -26,7 +25,6 @@ export default function ContributionHeatmap({ profile }) {
         yearSet.add(yr);
       }
     });
-    // Ensure current year is always included
     yearSet.add(new Date().getFullYear().toString());
     return Array.from(yearSet).sort((a, b) => b - a);
   }, [profile]);
@@ -40,7 +38,6 @@ export default function ContributionHeatmap({ profile }) {
       const today = new Date();
       start = new Date(today);
       start.setDate(today.getDate() - 364); // 52 weeks * 7 days
-      // Align to Sunday
       const dayOfWeek = start.getDay();
       start.setDate(start.getDate() - dayOfWeek);
     } else {
