@@ -2,7 +2,6 @@ import { Check, Loader2, Circle, GitBranch, GitCommit, PlusCircle, Activity } fr
 import { useMemo } from "react";
 
 const LearningRoadMapAndRecentActivity = ({ profile, aiRecommendations }) => {
-  // 1. Process Roadmap items dynamically
   const completedTech = useMemo(() => {
     if (profile && profile.languages) {
       return Object.keys(profile.languages).slice(0, 4);

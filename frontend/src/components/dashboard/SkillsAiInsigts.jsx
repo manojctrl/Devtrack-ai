@@ -17,10 +17,8 @@ const LANGUAGE_COLORS = {
 const DEFAULT_COLOR = { color: "#A1A1AA", fromColor: "#71717A", toColor: "#A1A1AA" };
 
 const SkillsAiInsigts = ({ profile, aiRecommendations, onTriggerAnalysis }) => {
-  // 1. Calculate top languages from profile languages
   const skillsData = useMemo(() => {
     if (!profile || !profile.languages) {
-      // Return fallback dummy data if not synced
       return [
         { name: "JavaScript", pct: "75%", ...LANGUAGE_COLORS.JavaScript },
         { name: "TypeScript", pct: "60%", ...LANGUAGE_COLORS.TypeScript },
@@ -50,7 +48,6 @@ const SkillsAiInsigts = ({ profile, aiRecommendations, onTriggerAnalysis }) => {
       .slice(0, 5);
   }, [profile]);
 
-  // 2. Parse AI recommendations
   const topLanguage = skillsData[0]?.name || "coding";
 
   const recommendedRole = aiRecommendations?.roleSuggestions?.[0]
