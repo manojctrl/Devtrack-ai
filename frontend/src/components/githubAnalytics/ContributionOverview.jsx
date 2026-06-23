@@ -17,7 +17,6 @@ const ContributionOverview = ({ profile }) => {
       return `${y}-${m}-${d}`;
     };
 
-    // Calculate Current Streak in UTC
     let currentStrk = 0;
     const checkDate = new Date();
     checkDate.setUTCHours(12, 0, 0, 0);
