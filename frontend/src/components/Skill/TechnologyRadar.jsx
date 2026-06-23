@@ -18,7 +18,6 @@ const TechnologyRadar = ({ profile, aiRecommendations }) => {
     const expertItems = [];
     const intermediateItems = [];
 
-    // Icon mapping by skill name
     const iconMap = {
       Java: <Coffee className="w-4 h-4 text-red-400" />,
       MySQL: <Database className="w-4 h-4 text-green-400" />,
@@ -48,7 +47,6 @@ const TechnologyRadar = ({ profile, aiRecommendations }) => {
       }
     });
 
-    // Fallbacks if empty
     if (expertItems.length === 0) {
       expertItems.push(
         { name: "JavaScript", pct: "90%", pctColor: "text-emerald-400", icon: <Code className="w-4 h-4 text-indigo-400" />, iconBg: "bg-indigo-500/10" },
@@ -62,7 +60,6 @@ const TechnologyRadar = ({ profile, aiRecommendations }) => {
       );
     }
 
-    // Learning
     const learningItems = [];
     const roadmap = aiRecommendations?.learningRoadmap || [];
     roadmap.forEach((item) => {
