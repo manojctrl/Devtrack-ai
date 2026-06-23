@@ -18,15 +18,26 @@ const TechnologyRadar = ({ profile, aiRecommendations }) => {
     const expertItems = [];
     const intermediateItems = [];
 
+    // Icon mapping by skill name
+    const iconMap = {
+      Java: <Coffee className="w-4 h-4 text-red-400" />,
+      MySQL: <Database className="w-4 h-4 text-green-400" />,
+      Node: <Server className="w-4 h-4 text-yellow-400" />,
+      React: <Code className="w-4 h-4 text-sky-400" />,
+      TypeScript: <Code className="w-4 h-4 text-blue-400" />,
+      Docker: <GitMerge className="w-4 h-4 text-sky-400" />,
+      AWS: <Cloud className="w-4 h-4 text-amber-400" />,
+    };
+
     entries.forEach(([name, count]) => {
-      const pctVal = total ? Math.round((count / total) * 105) : 75; // weight slightly higher for display
+      const pctVal = total ? Math.round((count / total) * 100) : 75; // normalized to 100
       const pct = `${Math.min(pctVal, 100)}%`;
 
       const item = {
         name,
         pct,
         pctColor: pctVal >= 70 ? "text-emerald-400" : "text-amber-400",
-        icon: <Code className="w-4 h-4 text-indigo-400" />,
+        icon: iconMap[name] || <Code className="w-4 h-4 text-indigo-400" />,
         iconBg: "bg-indigo-500/10",
       };
 
@@ -41,12 +52,12 @@ const TechnologyRadar = ({ profile, aiRecommendations }) => {
     if (expertItems.length === 0) {
       expertItems.push(
         { name: "JavaScript", pct: "90%", pctColor: "text-emerald-400", icon: <Code className="w-4 h-4 text-indigo-400" />, iconBg: "bg-indigo-500/10" },
-        { name: "HTML5/CSS3", pct: "85%", pctColor: "text-emerald-400", icon: <Code className="w-4 h-4 text-indigo-400" />, iconBg: "bg-indigo-500/10" }
+        { name: "HTML5/CSS3", pct: "85%", pctColor: "text-emerald-400", icon: <Code className="w-4 h-4 text-pink-400" />, iconBg: "bg-pink-500/10" }
       );
     }
     if (intermediateItems.length === 0) {
       intermediateItems.push(
-        { name: "TypeScript", pct: "65%", pctColor: "text-amber-400", icon: <Code className="w-4 h-4 text-emerald-400" />, iconBg: "bg-emerald-500/10" },
+        { name: "TypeScript", pct: "65%", pctColor: "text-amber-400", icon: <Code className="w-4 h-4 text-blue-400" />, iconBg: "bg-blue-500/10" },
         { name: "React", pct: "60%", pctColor: "text-amber-400", icon: <Code className="w-4 h-4 text-sky-400" />, iconBg: "bg-sky-500/10" }
       );
     }
@@ -54,12 +65,12 @@ const TechnologyRadar = ({ profile, aiRecommendations }) => {
     // Learning
     const learningItems = [];
     const roadmap = aiRecommendations?.learningRoadmap || [];
-    roadmap.forEach((item, idx) => {
+    roadmap.forEach((item) => {
       learningItems.push({
         name: item.topic,
         pct: item.importance === "High" ? "30%" : "15%",
         pctColor: "text-purple-400",
-        icon: <Cloud className="w-4 h-4 text-purple-400" />,
+        icon: iconMap[item.topic] || <Cloud className="w-4 h-4 text-purple-400" />,
         iconBg: "bg-purple-500/10",
       });
     });
@@ -130,7 +141,7 @@ const TechnologyRadar = ({ profile, aiRecommendations }) => {
                     <div className={`w-7 h-7 rounded-md flex items-center justify-center transition-transform group-hover:scale-105 shrink-0 ${item.iconBg}`}>
                       {item.icon}
                     </div>
-                    <span className="text-xs font-bold text-gray-300 tracking-wide truncate">
+                    <span className="text-xs font-bold text-gray-300 tracking-wide break-words">
                       {item.name}
                     </span>
                   </div>
