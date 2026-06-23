@@ -33,7 +33,6 @@ const LearningRoadmap = ({ learningRoadmap, profile }) => {
       });
     }
 
-    // 2. Add AI Roadmap recommendations
     const roadmapData = learningRoadmap || [];
     roadmapData.forEach((item, index) => {
       const isInProgress = index === 0;
