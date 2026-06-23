@@ -10,7 +10,6 @@ const LearningRoadmap = ({ learningRoadmap, profile }) => {
   const roadmapItems = useMemo(() => {
     const items = [];
     
-    // 1. Add Completed languages
     if (profile && profile.languages) {
       Object.keys(profile.languages).slice(0, 3).forEach((lang) => {
         items.push({
