@@ -23,7 +23,7 @@ const SkillOverview = ({ profile }) => {
     });
 
     return {
-      totalSkills: entries.length || 5, // fallback if empty
+      totalSkills: entries.length || 5, 
       advanced: entries.length ? advCount : 2,
       intermediate: entries.length ? intCount : 2,
       beginner: entries.length ? begCount : 1,
