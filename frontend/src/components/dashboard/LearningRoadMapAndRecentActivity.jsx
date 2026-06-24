@@ -120,7 +120,6 @@ const LearningRoadMapAndRecentActivity = ({ profile, aiRecommendations }) => {
             </div>
           </div>
 
-          {/* In Progress Tech */}
           <div>
             <div className="text-xs font-semibold text-amber-400 tracking-wider uppercase mb-3">🔄 In Progress</div>
             {inProgressTech.map((tech) => (
@@ -136,7 +135,6 @@ const LearningRoadMapAndRecentActivity = ({ profile, aiRecommendations }) => {
             ))}
           </div>
 
-          {/* Upcoming Tech */}
           <div>
             <div className="text-xs font-semibold text-slate-400 tracking-wider uppercase mb-3">⏳ Upcoming</div>
             <div className="space-y-2">
@@ -156,7 +154,6 @@ const LearningRoadMapAndRecentActivity = ({ profile, aiRecommendations }) => {
         </div>
       </div>
 
-      {/* Recent Activity Pane */}
       <div className="flex-1 bg-[#1a2035] border border-white/5 rounded-2xl p-6 shadow-xl">
         <div className="mb-6">
           <h2 className="text-xl font-bold tracking-tight text-white">Recent Activity</h2>
