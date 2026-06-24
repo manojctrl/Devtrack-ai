@@ -33,7 +33,6 @@ const LearningRoadMapAndRecentActivity = ({ profile, aiRecommendations }) => {
     ];
   }, [aiRecommendations]);
 
-  // 2. Process Recent Activities
   const recentActivities = useMemo(() => {
     const list = profile?.recentActivity || [];
     if (list.length === 0) {
@@ -92,7 +91,6 @@ const LearningRoadMapAndRecentActivity = ({ profile, aiRecommendations }) => {
 
   return (
     <div className="flex flex-col lg:flex-row gap-6 w-full text-slate-100 mt-6">
-      {/* Learning Roadmap Pane */}
       <div className="flex-1 bg-[#1a2035] border border-white/5 rounded-2xl p-6 shadow-xl">
         <div className="flex justify-between items-start mb-6">
           <div>
@@ -105,7 +103,6 @@ const LearningRoadMapAndRecentActivity = ({ profile, aiRecommendations }) => {
         </div>
 
         <div className="space-y-6">
-          {/* Completed Tech */}
           <div>
             <div className="text-xs font-semibold text-emerald-400 tracking-wider uppercase mb-3">✅ Completed</div>
             <div className="space-y-2">
